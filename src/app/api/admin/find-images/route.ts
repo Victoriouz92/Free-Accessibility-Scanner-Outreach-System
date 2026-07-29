@@ -91,25 +91,51 @@ async function findImagesOnPage(page: any, pageUrl: string) {
     for (const img of images) {
       const alt = img.getAttribute("alt");
       const src = img.src;
+      const rawSrc = img.getAttribute("src") || "";
 
-      // Skip tiny images (likely icons/spacers), data URIs, and SVGs
-      if (!src || src.startsWith("data:") || src.endsWith(".svg")) continue;
-      if (img.width < 30 && img.height < 30) continue;
+      // Skip images with no src at all
+      if (!src && !rawSrc) continue;
 
-      // Missing alt or empty alt on non-decorative image
+      // Skip only SVG files (not data: URIs — those can be real content)
+      if (src.endsWith(".svg") || rawSrc.endsWith(".svg")) continue;
+
+      // Skip truly tiny images (1x1 spacers, tracking pixels)
+      if (img.naturalWidth > 0 && img.naturalWidth < 10 && img.naturalHeight < 10) continue;
+      if (img.width < 10 && img.height < 10) continue;
+
+      // Flag if alt is missing entirely (null) — this is an accessibility violation
       if (alt === null || alt === undefined) {
+        // Keep full src for preview, truncated version for display
+        const fullSrc = src;
+        const displaySrc = src.startsWith("data:")
+          ? src.slice(0, 50) + "..."
+          : src;
+
         // Build a CSS selector for this image
         let selector = "img";
-        if (img.id) selector = `#${img.id}`;
-        else if (img.className) selector = `img.${img.className.split(" ").join(".")}`;
-        else selector = `img[src="${img.getAttribute("src")}"]`;
+        if (img.id) {
+          selector = `#${img.id}`;
+        } else if (img.className && img.className.trim()) {
+          selector = `img.${img.className.trim().split(/\s+/).join(".")}`;
+        } else if (rawSrc && !rawSrc.startsWith("data:")) {
+          selector = `img[src="${rawSrc}"]`;
+        } else {
+          // Use nth-child for data: images
+          const parent = img.parentElement;
+          if (parent) {
+            const siblings = Array.from(parent.querySelectorAll("img"));
+            const index = siblings.indexOf(img);
+            selector = `img:nth-of-type(${index + 1})`;
+          }
+        }
 
         // Get some context (parent element's text)
         const parent = img.closest("figure, article, section, div");
         const contextText = parent?.textContent?.trim().slice(0, 100) || "";
 
         results.push({
-          src,
+          src: fullSrc,
+          displaySrc,
           currentAlt: null,
           context: contextText,
           selector,

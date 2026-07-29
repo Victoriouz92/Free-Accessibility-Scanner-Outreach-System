@@ -14,9 +14,10 @@ import { locales, defaultLocale } from "./lib/i18n/config";
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes, static files, and Next.js internals
+  // Skip API routes, static files, internal tools, and Next.js internals
   if (
     pathname.startsWith("/api") ||
+    pathname.startsWith("/tools") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
     pathname.includes(".")

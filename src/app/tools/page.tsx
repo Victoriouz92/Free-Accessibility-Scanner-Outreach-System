@@ -13,7 +13,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Image Remediation Tool */}
         <a
-          href="/admin/remediate"
+          href="/tools/remediate"
           className="bg-surface rounded-xl border border-border p-6 hover:border-primary
                      transition-colors group"
         >

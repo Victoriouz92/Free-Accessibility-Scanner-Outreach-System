@@ -119,14 +119,24 @@ function generateFromContext(
  * Generate a basic fallback description from the image filename and context.
  */
 function generateFallback(img: { src: string; context: string }): string {
+  // data: URIs don't have useful filenames — use context only
+  if (img.src.startsWith("data:")) {
+    if (img.context && img.context.length > 5) {
+      const shortContext = img.context.slice(0, 60).trim();
+      return `[Review needed] Related to: ${shortContext}`;
+    }
+    return "[Review needed] Inline image — describe manually or use AI";
+  }
+
   // Try to extract something useful from the filename
   try {
     const url = new URL(img.src);
     const filename = url.pathname.split("/").pop() || "";
     const name = filename
       .replace(/\.[^.]+$/, "") // remove extension
-      .replace(/[-_]/g, " ") // replace dashes/underscores with spaces
-      .replace(/[0-9]+/g, "") // remove numbers
+      .replace(/[-_]+/g, " ") // replace dashes/underscores with spaces
+      .replace(/[0-9]{4,}/g, "") // remove long number sequences
+      .replace(/\s+/g, " ")
       .trim();
 
     if (name.length > 3) {
@@ -138,7 +148,7 @@ function generateFallback(img: { src: string; context: string }): string {
 
   // Use page context if available
   if (img.context && img.context.length > 5) {
-    const shortContext = img.context.slice(0, 50).trim();
+    const shortContext = img.context.slice(0, 60).trim();
     return `[Review needed] Related to: ${shortContext}`;
   }
 

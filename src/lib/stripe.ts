@@ -1,27 +1,32 @@
+import Stripe from "stripe";
+
 /**
  * Stripe Client
  *
- * WHAT IT IS: A helper to create Stripe payment sessions for the €1/€3 report tiers.
- * WHY IT EXISTS: Keeps payment logic in one place, separate from page components.
- * REAL WORLD ANALOGY: Like a cashier desk — all payments go through one point.
+ * WHAT IT IS: Handles payments for the €1/€3 report tiers.
+ * WHY IT EXISTS: Centralizes payment logic in one file.
  *
- * TODO: Install stripe when ready to connect:
- *   npm install stripe
- *
- * Then uncomment the code below and fill in your .env.local values.
+ * To set up:
+ * 1. Create products in Stripe Dashboard for "Detailed Report" (€1) and "Full Report + PDF" (€3)
+ * 2. Copy the Price IDs and put them below
+ * 3. Add your Stripe keys to .env.local
  */
 
-// import Stripe from "stripe";
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2025-02-24.acacia",
+});
 
-// export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-//   apiVersion: "2024-12-18.acacia",
-// });
-
-// Price IDs for the two report tiers
-// TODO: Create these products in your Stripe Dashboard
-// export const PRICES = {
-//   detailed: "price_xxx", // €1 detailed report
-//   full: "price_xxx",     // €3 full report + PDF
-// };
-
-export {};
+// Price configuration
+// TODO: Replace with your real Stripe Price IDs from the Dashboard
+export const REPORT_PRICES = {
+  detailed: {
+    priceId: process.env.STRIPE_PRICE_DETAILED || "price_detailed_placeholder",
+    amount: 100, // €1.00 in cents
+    label: "Detailed Report",
+  },
+  full: {
+    priceId: process.env.STRIPE_PRICE_FULL || "price_full_placeholder",
+    amount: 300, // €3.00 in cents
+    label: "Full Report + PDF",
+  },
+};

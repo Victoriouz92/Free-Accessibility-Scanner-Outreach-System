@@ -2,9 +2,9 @@
 
 /* 
   AccessCheck Design Tokens
-  - Warm, calm, human tone (not enterprise/scary)
-  - Primary: warm teal (friendly, approachable)
-  - Background: off-white for warmth
+  - Warm, calm, professional tone
+  - Primary: warm teal (friendly, trustworthy)
+  - Background: off-white with subtle gradient
   - Severity colors: traffic-light scheme (always paired with icons + text)
 */
 
@@ -40,6 +40,27 @@ body {
   line-height: 1.6;
 }
 
+/* Professional background: subtle dot pattern + gradient */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(42, 157, 143, 0.04) 1px, transparent 0);
+  background-size: 32px 32px;
+}
+
+/* Gradient accent behind the hero area */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(42, 157, 143, 0.06) 0%,
+    rgba(232, 245, 243, 0.4) 50%,
+    rgba(42, 157, 143, 0.03) 100%
+  );
+}
+
 /* Focus indicators - visible on every interactive element (WCAG requirement) */
 *:focus-visible {
   outline: 3px solid var(--color-primary);
@@ -62,4 +83,14 @@ body {
 
 .skip-link:focus {
   top: 0;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(42, 157, 143, 0.1), 0 4px 10px -3px rgba(0, 0, 0, 0.05);
 }

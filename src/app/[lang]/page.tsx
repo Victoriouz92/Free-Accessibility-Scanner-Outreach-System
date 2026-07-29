@@ -15,33 +15,42 @@ export default async function HomePage({ params }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-16 sm:py-24 text-center">
-      {/* Hero */}
-      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-        {dict.hero.title}
-      </h1>
-      <p className="text-lg text-muted mb-10 max-w-xl mx-auto">
-        {dict.hero.subtitle}
-      </p>
+    <>
+      {/* Hero section with gradient background */}
+      <section className="hero-gradient py-20 sm:py-28">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight mb-5 text-foreground">
+            {dict.hero.title}
+          </h1>
+          <p className="text-lg sm:text-xl text-muted mb-10 max-w-2xl mx-auto leading-relaxed">
+            {dict.hero.subtitle}
+          </p>
 
-      {/* URL input + scan button */}
-      <ScanForm lang={lang} dict={dict.hero} />
+          {/* URL input + scan button */}
+          <ScanForm lang={lang} dict={dict.hero} />
+        </div>
+      </section>
 
       {/* Trust indicators */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-        <div className="bg-surface rounded-xl p-5 border border-border">
-          <p className="font-semibold mb-1">⚡ {dict.trust.fast}</p>
-          <p className="text-sm text-muted">{dict.trust.fastDesc}</p>
+      <section className="max-w-4xl mx-auto px-6 -mt-8 relative z-10 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="bg-surface rounded-xl p-6 border border-border card-hover shadow-sm">
+            <div className="text-2xl mb-3">⚡</div>
+            <p className="font-semibold mb-1">{dict.trust.fast}</p>
+            <p className="text-sm text-muted">{dict.trust.fastDesc}</p>
+          </div>
+          <div className="bg-surface rounded-xl p-6 border border-border card-hover shadow-sm">
+            <div className="text-2xl mb-3">🔒</div>
+            <p className="font-semibold mb-1">{dict.trust.private}</p>
+            <p className="text-sm text-muted">{dict.trust.privateDesc}</p>
+          </div>
+          <div className="bg-surface rounded-xl p-6 border border-border card-hover shadow-sm">
+            <div className="text-2xl mb-3">✅</div>
+            <p className="font-semibold mb-1">{dict.trust.actionable}</p>
+            <p className="text-sm text-muted">{dict.trust.actionableDesc}</p>
+          </div>
         </div>
-        <div className="bg-surface rounded-xl p-5 border border-border">
-          <p className="font-semibold mb-1">🔒 {dict.trust.private}</p>
-          <p className="text-sm text-muted">{dict.trust.privateDesc}</p>
-        </div>
-        <div className="bg-surface rounded-xl p-5 border border-border">
-          <p className="font-semibold mb-1">✅ {dict.trust.actionable}</p>
-          <p className="text-sm text-muted">{dict.trust.actionableDesc}</p>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

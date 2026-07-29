@@ -17,6 +17,7 @@ import { useState } from "react";
 
 interface ImageIssue {
   src: string;
+  displaySrc?: string;
   currentAlt: string | null;
   suggestedAlt: string;
   context: string; // surrounding HTML context
@@ -257,7 +258,7 @@ export function RemediationTool() {
 
                   {/* Details */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted truncate mb-1">{img.src}</p>
+                    <p className="text-xs text-muted truncate mb-1">{img.displaySrc || img.src}</p>
                     <p className="text-xs text-muted mb-2">Page: {img.pageUrl}</p>
 
                     {/* Alt text input */}
