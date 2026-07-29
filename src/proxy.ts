@@ -51,8 +51,15 @@ function detectLocale(acceptLanguage: string): string {
   // Map browser language codes to our locale keys
   const langMap: Record<string, string> = {
     en: "en",
-    bg: "bg",
+    de: "de",
+    fr: "fr",
     es: "es",
+    it: "it",
+    nl: "nl",
+    pl: "pl",
+    pt: "pt",
+    ro: "ro",
+    bg: "bg",
     el: "gr", // Greek browser code "el" maps to our "gr" URL prefix
     gr: "gr",
   };

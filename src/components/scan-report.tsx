@@ -14,9 +14,10 @@ interface Props {
   scanId: string;
   lang: string;
   dict: Dictionary;
+  cached?: boolean;
 }
 
-export function ScanReport({ result, scanId, lang, dict }: Props) {
+export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
   return (
     <div>
       {/* Score + Summary */}
@@ -25,6 +26,15 @@ export function ScanReport({ result, scanId, lang, dict }: Props) {
         <p className="text-muted mb-6">{result.url}</p>
         <ScoreDisplay score={result.score} dict={dict.report} />
       </div>
+
+      {/* Cached results notice */}
+      {cached && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 text-center">
+          <p className="text-sm text-yellow-800">
+            ⏱️ {dict.report.cachedNotice}
+          </p>
+        </div>
+      )}
 
       {/* Issue breakdown by severity */}
       <div className="bg-surface rounded-xl border border-border p-6 mb-8">

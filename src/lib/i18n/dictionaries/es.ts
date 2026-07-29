@@ -67,6 +67,7 @@ const es = {
     detailsDesc: "Obtén cada problema listado con explicaciones claras y prioridades de corrección.",
     detailedReport: "Informe detallado — 1€",
     fullReport: "Informe completo + PDF — 3€",
+    cachedNotice: "Estos resultados son de un escaneo reciente. Nuevos resultados estarán disponibles en 24 horas.",
   },
 
   // Niveles de severidad

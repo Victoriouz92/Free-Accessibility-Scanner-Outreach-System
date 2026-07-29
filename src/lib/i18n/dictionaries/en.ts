@@ -69,6 +69,7 @@ const en = {
     detailsDesc: "Get every issue listed with plain-language explanations and fix priorities.",
     detailedReport: "Detailed report — €1",
     fullReport: "Full report + PDF — €3",
+    cachedNotice: "These results are from a recent scan. New results will be available in 24 hours.",
   },
 
   // Severity labels

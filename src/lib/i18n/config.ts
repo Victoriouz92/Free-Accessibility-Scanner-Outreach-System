@@ -6,23 +6,40 @@
  * REAL WORLD ANALOGY: A menu board listing which languages are available at a help desk.
  */
 
-export const locales = ["en", "bg", "es", "gr"] as const;
+export const locales = [
+  "en", "de", "fr", "es", "it", "nl", "pl", "pt", "ro", "bg", "gr",
+] as const;
+
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "en";
 
-// Human-readable names for the language switcher
+// Human-readable names (in their own language) for the dropdown
 export const localeNames: Record<Locale, string> = {
   en: "English",
-  bg: "Български",
+  de: "Deutsch",
+  fr: "Français",
   es: "Español",
+  it: "Italiano",
+  nl: "Nederlands",
+  pl: "Polski",
+  pt: "Português",
+  ro: "Română",
+  bg: "Български",
   gr: "Ελληνικά",
 };
 
 // HTML lang attributes (ISO 639-1 codes)
 export const localeHtmlLang: Record<Locale, string> = {
   en: "en",
-  bg: "bg",
+  de: "de",
+  fr: "fr",
   es: "es",
-  gr: "el", // Greek ISO code is "el", even though we use "gr" in URLs
+  it: "it",
+  nl: "nl",
+  pl: "pl",
+  pt: "pt",
+  ro: "ro",
+  bg: "bg",
+  gr: "el", // Greek ISO code is "el", we use "gr" in URLs
 };

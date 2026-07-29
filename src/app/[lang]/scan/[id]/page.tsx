@@ -8,15 +8,17 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface Props {
   params: Promise<{ lang: string; id: string }>;
+  searchParams: Promise<{ cached?: string }>;
 }
 
-export default async function ScanPage({ params }: Props) {
+export default async function ScanPage({ params, searchParams }: Props) {
   const { lang, id } = await params;
+  const { cached } = await searchParams;
   const dict = await getDictionary(lang as Locale);
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
-      <ScanProgress scanId={id} lang={lang} dict={dict} />
+      <ScanProgress scanId={id} lang={lang} dict={dict} cached={cached === "1"} />
     </section>
   );
 }

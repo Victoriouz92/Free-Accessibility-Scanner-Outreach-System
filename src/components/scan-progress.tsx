@@ -16,9 +16,10 @@ interface Props {
   scanId: string;
   lang: string;
   dict: Dictionary;
+  cached?: boolean;
 }
 
-export function ScanProgress({ scanId, lang, dict }: Props) {
+export function ScanProgress({ scanId, lang, dict, cached }: Props) {
   const [status, setStatus] = useState<"scanning" | "complete" | "error">("scanning");
   const [currentStep, setCurrentStep] = useState(0);
   const [result, setResult] = useState<ScanResult | null>(null);
@@ -73,7 +74,7 @@ export function ScanProgress({ scanId, lang, dict }: Props) {
   }
 
   if (status === "complete" && result) {
-    return <ScanReport result={result} scanId={scanId} lang={lang} dict={dict} />;
+    return <ScanReport result={result} scanId={scanId} lang={lang} dict={dict} cached={cached} />;
   }
 
   return (

@@ -4,15 +4,11 @@ import { runScan } from "@/lib/scanner";
 
 /**
  * POST /api/scan
- * Starts a new scan job.
- * - Validates the URL
- * - Creates a row in Supabase with status "scanning"
- * - Runs the real axe-core scan
- * - Updates the row with results when complete
- *
- * Note: For now this runs synchronously (scan happens during the request).
- * At scale, you'd move this to a background queue worker.
+ * Starts a new scan job — or returns a cached result if the same URL
+ * was scanned within the last 24 hours.
  */
+
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,10 +26,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    // Create a scan row with status "scanning"
+    // Normalize URL for caching (remove trailing slash, lowercase)
+    const normalizedUrl = url.replace(/\/+$/, "").toLowerCase();
+
+    // Check for a recent completed scan of this URL (within 24h)
+    const cutoff = new Date(Date.now() - CACHE_DURATION_MS).toISOString();
+    const { data: cachedScan } = await supabaseAdmin
+      .from("scans")
+      .select("id, created_at")
+      .eq("url", normalizedUrl)
+      .eq("status", "complete")
+      .gte("created_at", cutoff)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (cachedScan) {
+      // Return the cached scan — frontend will get results immediately
+      console.log(`[Cache] Returning cached scan for ${normalizedUrl} (ID: ${cachedScan.id})`);
+      return NextResponse.json({
+        scanId: cachedScan.id,
+        status: "complete",
+        cached: true,
+      });
+    }
+
+    // No cache — create a new scan
     const { data, error } = await supabaseAdmin
       .from("scans")
-      .insert({ url, status: "scanning" })
+      .insert({ url: normalizedUrl, status: "scanning" })
       .select("id")
       .single();
 
@@ -44,10 +65,10 @@ export async function POST(request: NextRequest) {
 
     const scanId = data.id;
 
-    // Run the actual scan in the background (don't await — let client poll)
-    runScanAndStore(scanId, url);
+    // Run the scan in the background
+    runScanAndStore(scanId, normalizedUrl);
 
-    return NextResponse.json({ scanId, status: "scanning" });
+    return NextResponse.json({ scanId, status: "scanning", cached: false });
   } catch (err) {
     console.error("Scan API error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -56,7 +77,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * Runs the scan and stores results in Supabase.
- * This runs in the background — the POST response returns immediately.
+ * Runs in the background — the POST returns immediately.
  */
 async function runScanAndStore(scanId: string, url: string) {
   try {
@@ -64,7 +85,6 @@ async function runScanAndStore(scanId: string, url: string) {
     const result = await runScan(url);
     console.log(`[runScanAndStore] Scan complete! Score: ${result.score}, Issues: ${JSON.stringify(result.issues)}`);
 
-    // Store completed results
     const { error: updateError } = await supabaseAdmin
       .from("scans")
       .update({
@@ -87,12 +107,11 @@ async function runScanAndStore(scanId: string, url: string) {
   } catch (err) {
     console.error(`[runScanAndStore] SCAN FAILED for ${url}:`, err);
 
-    // Store the error so the frontend shows it
     await supabaseAdmin
       .from("scans")
       .update({
         status: "error",
-        error_message: err instanceof Error ? err.message : "Scan failed — is Chromium installed? Run: npx playwright install chromium",
+        error_message: err instanceof Error ? err.message : "Scan failed",
       })
       .eq("id", scanId);
   }
