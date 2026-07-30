@@ -20,13 +20,13 @@
   /* Severity indicators */
   --color-critical: #c0392b;
   --color-serious: #d35400;
-  --color-moderate: #f39c12;
+  --color-moderate: #b27300;
   --color-minor: #7f8c8d;
 
   /* Neutrals */
   --color-surface: #ffffff;
   --color-border: #e5e5e5;
-  --color-muted: #6b7280;
+  --color-muted: #525252;
 
   /* Typography */
   --font-sans: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -83,6 +83,41 @@ body::before {
 
 .skip-link:focus {
   top: 0;
+}
+
+/* Dark mode overrides */
+.dark body {
+  background-color: #1a1a2e;
+  color: #e8e8e8;
+}
+
+.dark .bg-surface {
+  background-color: #16213e;
+}
+
+.dark .bg-background {
+  background-color: #1a1a2e;
+}
+
+.dark .border-border {
+  border-color: #2a2a4a;
+}
+
+.dark .text-muted {
+  color: #a1a1aa;
+}
+
+.dark .text-foreground {
+  color: #f3f4f6;
+}
+
+.dark .hero-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(42, 157, 143, 0.12) 0%,
+    rgba(26, 26, 46, 0.8) 50%,
+    rgba(42, 157, 143, 0.06) 100%
+  );
 }
 
 /* Card hover effect */

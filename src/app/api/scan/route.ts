@@ -13,7 +13,7 @@ const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url } = body;
+    const { url, nocache } = body;
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
@@ -30,26 +30,27 @@ export async function POST(request: NextRequest) {
     const normalizedUrl = url.replace(/\/+$/, "").toLowerCase();
 
     // Check for a recent completed scan of this URL (within 24h)
-    // Also check the base domain in case the stored URL is the post-redirect version
-    const cutoff = new Date(Date.now() - CACHE_DURATION_MS).toISOString();
-    const { data: cachedScan } = await supabaseAdmin
-      .from("scans")
-      .select("id, created_at")
-      .or(`url.eq.${normalizedUrl},url.ilike.${normalizedUrl}%`)
-      .eq("status", "complete")
-      .gte("created_at", cutoff)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    // Skip cache if nocache flag is set
+    if (!nocache) {
+      const cutoff = new Date(Date.now() - CACHE_DURATION_MS).toISOString();
+      const { data: cachedScan } = await supabaseAdmin
+        .from("scans")
+        .select("id, created_at")
+        .or(`url.eq.${normalizedUrl},url.ilike.${normalizedUrl}%`)
+        .eq("status", "complete")
+        .gte("created_at", cutoff)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
 
-    if (cachedScan) {
-      // Return the cached scan — frontend will get results immediately
-      console.log(`[Cache] Returning cached scan for ${normalizedUrl} (ID: ${cachedScan.id})`);
-      return NextResponse.json({
-        scanId: cachedScan.id,
-        status: "complete",
-        cached: true,
-      });
+      if (cachedScan) {
+        console.log(`[Cache] Returning cached scan for ${normalizedUrl} (ID: ${cachedScan.id})`);
+        return NextResponse.json({
+          scanId: cachedScan.id,
+          status: "complete",
+          cached: true,
+        });
+      }
     }
 
     // No cache — create a new scan

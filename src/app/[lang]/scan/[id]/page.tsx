@@ -17,7 +17,7 @@ export default async function ScanPage({ params, searchParams }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
+    <section className="max-w-3xl mx-auto px-6 py-12" aria-label="Scan results">
       <ScanProgress scanId={id} lang={lang} dict={dict} cached={cached === "1"} />
     </section>
   );

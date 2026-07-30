@@ -14,8 +14,8 @@ export default async function ImprintPage({ params }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-6">{dict.nav.imprint}</h1>
+    <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="imprint-heading">
+      <h1 id="imprint-heading" className="text-2xl font-bold mb-6">{dict.nav.imprint}</h1>
 
       <div className="bg-surface rounded-xl border border-border p-6 text-sm text-muted space-y-4">
         <p>[Company Name]</p>

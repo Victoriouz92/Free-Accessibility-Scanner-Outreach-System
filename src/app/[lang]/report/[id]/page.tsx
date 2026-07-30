@@ -26,14 +26,14 @@ export default async function ReportPage({ params, searchParams }: Props) {
   // If paid, show the unlocked report content
   if (isPaid) {
     return (
-      <section className="max-w-3xl mx-auto px-6 py-12">
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 text-center">
+      <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="report-paid-heading">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 text-center" role="status">
           <p className="text-green-800 font-medium">
-            ✅ Payment confirmed — your {tierName} is unlocked below.
+            <span aria-hidden="true">✅</span> Payment confirmed — your {tierName} is unlocked below.
           </p>
         </div>
 
-        <h1 className="text-2xl font-bold mb-6">{tierName}</h1>
+        <h1 id="report-paid-heading" className="text-2xl font-bold mb-6">{tierName}</h1>
 
         {/* TODO: Fetch and display full scan results from Supabase */}
         <div className="bg-surface rounded-xl border border-border p-8">
@@ -48,8 +48,8 @@ export default async function ReportPage({ params, searchParams }: Props) {
 
   // Payment gate
   return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-2">{tierName}</h1>
+    <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="report-gate-heading">
+      <h1 id="report-gate-heading" className="text-2xl font-bold mb-2">{tierName}</h1>
       <div className="mb-8">
         <CopyButton text={id} label="Scan ID:" />
       </div>
@@ -64,34 +64,34 @@ export default async function ReportPage({ params, searchParams }: Props) {
           {isFullTier ? (
             <ul className="text-left max-w-md mx-auto space-y-2">
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.violations}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.violations}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.explanation}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.explanation}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.effort}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.effort}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.selectors}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.selectors}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.pdf}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.pdf}
               </li>
             </ul>
           ) : (
             <ul className="text-left max-w-md mx-auto space-y-2">
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.violations}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.violations}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.explanation}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.explanation}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.effort}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.effort}
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> {dict.paidReport.features.grouped}
+                <span className="text-primary" aria-hidden="true">✓</span> {dict.paidReport.features.grouped}
               </li>
             </ul>
           )}

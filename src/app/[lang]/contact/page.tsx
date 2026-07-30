@@ -16,8 +16,8 @@ export default async function ContactPage({ params }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-2xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-2">{dict.contact.title}</h1>
+    <section className="max-w-2xl mx-auto px-6 py-12" aria-labelledby="contact-heading">
+      <h1 id="contact-heading" className="text-2xl font-bold mb-2">{dict.contact.title}</h1>
       <p className="text-muted mb-8">{dict.contact.subtitle}</p>
 
       <Suspense fallback={<div>Loading...</div>}>

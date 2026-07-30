@@ -14,8 +14,8 @@ export default async function EaaExplainedPage({ params }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-6">{dict.eaa.title}</h1>
+    <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="eaa-heading">
+      <h1 id="eaa-heading" className="text-2xl font-bold mb-6">{dict.eaa.title}</h1>
 
       <div className="space-y-8 text-sm leading-relaxed">
         <div>

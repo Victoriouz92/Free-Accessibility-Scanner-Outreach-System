@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { locales, localeNames, type Locale } from "@/lib/i18n/config";
 
 /**
@@ -18,6 +18,7 @@ interface Props {
 
 export function LanguageSwitcher({ currentLang }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,6 +48,12 @@ export function LanguageSwitcher({ currentLang }: Props) {
     return segments.join("/");
   }
 
+  function handleSelect(locale: string) {
+    setOpen(false);
+    const newPath = getLocalizedPath(locale);
+    router.push(newPath);
+  }
+
   const currentName = localeNames[currentLang as Locale] || "English";
 
   return (
@@ -55,7 +62,7 @@ export function LanguageSwitcher({ currentLang }: Props) {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        aria-label="Select language"
+        aria-label={`Select language. Current: ${currentName}`}
         className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium
                    text-muted hover:text-primary hover:bg-primary-light transition-colors
                    min-h-[44px]"
@@ -81,19 +88,26 @@ export function LanguageSwitcher({ currentLang }: Props) {
                      rounded-xl shadow-lg py-1 z-50 max-h-80 overflow-y-auto"
         >
           {locales.map((locale) => (
-            <li key={locale} role="option" aria-selected={locale === currentLang}>
-              <a
-                href={getLocalizedPath(locale)}
-                lang={locale === "gr" ? "el" : locale}
-                onClick={() => setOpen(false)}
-                className={`block px-4 py-2 text-sm transition-colors
-                  ${locale === currentLang
-                    ? "bg-primary-light text-primary font-medium"
-                    : "text-foreground hover:bg-primary-light hover:text-primary"
-                  }`}
-              >
-                {localeNames[locale]}
-              </a>
+            <li
+              key={locale}
+              role="option"
+              aria-selected={locale === currentLang}
+              tabIndex={0}
+              lang={locale === "gr" ? "el" : locale}
+              onClick={() => handleSelect(locale)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleSelect(locale);
+                }
+              }}
+              className={`block px-4 py-2 text-sm transition-colors cursor-pointer
+                ${locale === currentLang
+                  ? "bg-primary-light text-primary font-medium"
+                  : "text-foreground hover:bg-primary-light hover:text-primary"
+                }`}
+            >
+              {localeNames[locale]}
             </li>
           ))}
         </ul>

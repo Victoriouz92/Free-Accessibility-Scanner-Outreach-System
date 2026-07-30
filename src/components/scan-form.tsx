@@ -56,7 +56,9 @@ export function ScanForm({ lang, dict }: Props) {
       if (!response.ok) throw new Error("Failed to start scan");
 
       const data = await response.json();
-      router.push(`/${lang}/scan/${data.scanId}${data.cached ? "?cached=1" : ""}`);
+      // Add nocache param to force fresh scan
+      const cacheParam = data.cached ? "?cached=1" : "";
+      router.push(`/${lang}/scan/${data.scanId}${cacheParam}`);
     } catch {
       setError(dict.errorGeneric);
       setLoading(false);

@@ -45,8 +45,8 @@ export default async function BlogArticlePage({ params }: Props) {
 
   return (
     <article className="max-w-3xl mx-auto px-6 py-12">
-      <a href={`/${lang}/blog`} className="text-sm text-primary hover:underline mb-4 inline-block">
-        ← Back to blog
+      <a href={`/${lang}/blog`} className="text-sm text-primary underline hover:text-primary-hover mb-4 inline-block">
+        <span aria-hidden="true">←</span> Back to blog
       </a>
 
       {/* Hero image */}
@@ -56,12 +56,12 @@ export default async function BlogArticlePage({ params }: Props) {
         className="w-full h-64 sm:h-80 object-cover rounded-xl mb-6"
       />
 
-      <time className="block text-sm text-muted mb-2">{post.date}</time>
+      <time className="block text-sm text-muted mb-2" dateTime={post.date}>{post.date}</time>
       <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
 
       {/* Render content as simple paragraphs and headings */}
       <div className="prose-content space-y-4">
-        {post.content.split("\n\n").map((block, i) => {
+        {post.content.split("\n\n").map((block: string, i: number) => {
           if (block.startsWith("## ")) {
             return (
               <h2 key={i} className="text-xl font-semibold mt-8 mb-3">
@@ -81,7 +81,7 @@ export default async function BlogArticlePage({ params }: Props) {
             const items = block.split("\n");
             return (
               <ul key={i} className="list-disc pl-6 space-y-1 text-sm text-muted">
-                {items.map((item, j) => (
+                {items.map((item: string, j: number) => (
                   <li key={j}>{item.replace(/^[-\d]+\.?\s/, "")}</li>
                 ))}
               </ul>
@@ -102,7 +102,7 @@ export default async function BlogArticlePage({ params }: Props) {
           href={`/${lang}`}
           className="inline-block px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-hover transition-colors"
         >
-          Scan for free →
+          Scan for free <span aria-hidden="true">→</span>
         </a>
       </div>
     </article>

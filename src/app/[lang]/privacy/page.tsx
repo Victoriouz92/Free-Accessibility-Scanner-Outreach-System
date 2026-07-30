@@ -14,8 +14,8 @@ export default async function PrivacyPage({ params }: Props) {
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-bold mb-6">{dict.nav.privacy}</h1>
+    <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="privacy-heading">
+      <h1 id="privacy-heading" className="text-2xl font-bold mb-6">{dict.nav.privacy}</h1>
 
       <div className="text-sm text-muted space-y-4">
         <p>[Placeholder — replace with real privacy policy before launch.]</p>

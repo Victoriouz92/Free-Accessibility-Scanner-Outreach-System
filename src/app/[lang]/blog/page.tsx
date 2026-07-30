@@ -20,8 +20,8 @@ export default async function BlogPage({ params }: Props) {
   const posts = getAllPosts().map((p) => getLocalizedPost(p, lang));
 
   return (
-    <section className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-2">Blog</h1>
+    <section className="max-w-6xl mx-auto px-6 py-12" aria-labelledby="blog-heading">
+      <h1 id="blog-heading" className="text-3xl font-bold mb-2">Blog</h1>
       <p className="text-muted mb-10">
         Guides and articles about web accessibility, the EAA, and compliance.
       </p>
@@ -31,6 +31,7 @@ export default async function BlogPage({ params }: Props) {
           <a
             key={post.slug}
             href={`/${lang}/blog/${post.slug}`}
+            aria-label={post.title}
             className="group block bg-surface rounded-xl border border-border overflow-hidden
                        card-hover relative"
           >
@@ -38,7 +39,8 @@ export default async function BlogPage({ params }: Props) {
             <div className="relative h-44 overflow-hidden">
               <img
                 src={post.image}
-                alt={post.imageAlt}
+                alt=""
+                aria-hidden="true"
                 className="w-full h-full object-cover transition-transform duration-300
                            group-hover:scale-105"
               />
@@ -56,14 +58,14 @@ export default async function BlogPage({ params }: Props) {
 
               {/* Excerpt — hidden by default, revealed on hover */}
               <div className="max-h-0 overflow-hidden opacity-0 group-hover:max-h-24 group-hover:opacity-100
-                              transition-all duration-300 ease-in-out">
+                              transition-all duration-300 ease-in-out" aria-hidden="true">
                 <p className="text-xs text-muted line-clamp-3 mb-2">{post.excerpt}</p>
               </div>
 
-              {/* Read more link */}
+              {/* Read more — visible to screen readers always */}
               <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100
-                               transition-opacity duration-300">
-                Read more →
+                               transition-opacity duration-300" aria-hidden="true">
+                Read more <span aria-hidden="true">→</span>
               </span>
             </div>
           </a>

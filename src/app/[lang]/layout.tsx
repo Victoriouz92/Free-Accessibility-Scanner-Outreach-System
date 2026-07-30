@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { locales, localeHtmlLang, type Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { DarkModeToggle } from "@/components/dark-mode-toggle";
 
 /**
  * Language-aware Layout
@@ -76,10 +77,11 @@ export default async function LangLayout({
           <a href={`/${lang}`} className="text-xl font-bold text-primary">
             {dict.nav.home}
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <a href={`/${lang}/blog`} className="text-sm text-muted hover:text-primary transition-colors">
               Blog
             </a>
+            <DarkModeToggle />
             <LanguageSwitcher currentLang={lang} />
           </div>
         </nav>
@@ -107,7 +109,7 @@ export default async function LangLayout({
               </a>
             </nav>
           </div>
-          <p className="text-xs text-center text-muted/60">
+          <p className="text-xs text-center text-muted">
             Developed by VV Labs ЕООД © 2026
           </p>
         </div>

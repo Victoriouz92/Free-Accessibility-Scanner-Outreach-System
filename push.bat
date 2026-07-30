@@ -1,6 +1,7 @@
 @echo off
 cd /d "%~dp0"
 git add -A
-git commit -m "fix: blog grid layout, hover effects, unique images, BG translations"
+git status
+git commit -m "fix: full WCAG 2.1 AA compliance audit - contrast, landmarks, aria, labels"
 git push origin main
 del "%~f0"
