@@ -25,7 +25,7 @@ export const blogPosts: BlogPost[] = [
     title: "What is the European Accessibility Act (EAA)?",
     date: "2025-06-15",
     image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=400&fit=crop",
-    imageAlt: "EU parliament building representing European legislation",
+    imageAlt: "EU flag and legal scales representing accessibility legislation",
     excerpt:
       "The EAA is EU-wide legislation requiring digital products and services to be accessible. Here's what businesses need to know about deadlines, consequences, and compliance.",
     content: `
@@ -73,8 +73,8 @@ The sooner you start, the less overwhelming it feels. Our free scanner can give 
     slug: "5-most-common-accessibility-issues",
     title: "5 Most Common Accessibility Issues and How to Fix Them",
     date: "2025-06-10",
-    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=400&fit=crop",
-    imageAlt: "Developer fixing code on a laptop screen",
+    image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&h=400&fit=crop",
+    imageAlt: "Code editor showing HTML markup with accessibility fixes",
     excerpt:
       "Most websites fail on the same 5 issues. Missing alt text, low contrast, unlabeled forms, keyboard traps, and heading structure. Here's how to fix each one.",
     content: `
@@ -136,8 +136,8 @@ These five issues account for the majority of accessibility failures. Fix them, 
     slug: "how-to-check-if-your-website-is-accessible",
     title: "How to Check if Your Website is Accessible",
     date: "2025-06-05",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop",
-    imageAlt: "Person checking accessibility results on a dashboard",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop",
+    imageAlt: "Person running a website audit on multiple screens",
     excerpt:
       "An introduction to automated vs manual accessibility testing. Learn what tools can catch, what requires human review, and when to hire professional help.",
     content: `
@@ -197,8 +197,8 @@ Accessibility isn't all-or-nothing. Every improvement helps real people use your
     slug: "legal-compliance-eaa-fines",
     title: "Legal Compliance: Protecting Your Business from Serious Fines",
     date: "2025-07-01",
-    image: "https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=800&h=400&fit=crop",
-    imageAlt: "Gavel and legal documents representing EU compliance",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=400&fit=crop",
+    imageAlt: "Professional working on legal documents at a desk",
     excerpt:
       "The European Accessibility Act is now enforceable. Businesses that sell to EU consumers must meet WCAG 2.1 AA or face fines. Here's what you need to know to stay compliant.",
     content: `
@@ -227,8 +227,8 @@ Don't wait for a complaint to arrive. Scan your website now and fix the issues b
     slug: "100-million-customers-accessibility",
     title: "Reaching 100 Million More Customers Through Accessibility",
     date: "2025-07-03",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=400&fit=crop",
-    imageAlt: "Diverse group of people using digital devices",
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=400&fit=crop",
+    imageAlt: "Crowd of diverse people representing a large market opportunity",
     excerpt:
       "Over 100 million EU citizens live with some form of disability. They have real purchasing power but can't spend it on inaccessible websites. Here's the opportunity you're missing.",
     content: `
@@ -259,8 +259,8 @@ Scan your website today to see how many potential customers you might be turning
     slug: "seo-accessibility-connection",
     title: "SEO and Accessibility: Why Search Engines See Your Site Like a Blind User",
     date: "2025-07-05",
-    image: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=800&h=400&fit=crop",
-    imageAlt: "Search engine results on a computer screen",
+    image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&h=400&fit=crop",
+    imageAlt: "Computer screen showing website analytics and search ranking data",
     excerpt:
       "Google's crawlers navigate your site the same way a screen reader does. Proper headings, alt text, and semantic HTML improve both accessibility and search rankings.",
     content: `
@@ -293,8 +293,8 @@ Scan your website now to identify issues that are hurting both your accessibilit
     slug: "better-ux-for-everyone",
     title: "Better User Experience for Absolutely Everyone",
     date: "2025-07-07",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop",
-    imageAlt: "Person comfortably using a smartphone in sunlight",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop",
+    imageAlt: "People using phones and laptops in various everyday situations",
     excerpt:
       "Accessibility isn't just for people with disabilities. High contrast helps in sunlight, subtitles help in noisy cafes, and keyboard navigation helps when your mouse breaks.",
     content: `
@@ -327,8 +327,8 @@ Scan your website to find the barriers that frustrate all your users — not jus
     slug: "aging-population-web-accessibility",
     title: "Europe's Aging Population: Preparing Your Website for the Future",
     date: "2025-07-09",
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=400&fit=crop",
-    imageAlt: "Senior person using a tablet computer",
+    image: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&h=400&fit=crop",
+    imageAlt: "Elderly man reading on a tablet with reading glasses",
     excerpt:
       "By 2030, one in four Europeans will be over 65. Age brings declining vision, reduced motor control, and slower processing. Is your website ready for your future customers?",
     content: `
@@ -362,8 +362,8 @@ Scan your website now to identify the barriers that could be driving away your m
     slug: "conversion-rate-accessibility",
     title: "Higher Conversion Rates Through Accessible Design",
     date: "2025-07-11",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop",
-    imageAlt: "Analytics dashboard showing conversion metrics",
+    image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=400&fit=crop",
+    imageAlt: "Shopping cart and rising graph showing improved sales",
     excerpt:
       "Every accessibility barrier is a point where users abandon your site. Clear forms, readable text, and logical navigation don't just help disabled users — they boost conversions for everyone.",
     content: `
@@ -396,8 +396,8 @@ Scan your site to find the barriers that are costing you conversions right now.
     slug: "clean-code-faster-loading",
     title: "Clean Code, Faster Loading, Lower Maintenance Costs",
     date: "2025-07-13",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop",
-    imageAlt: "Clean code on a developer screen",
+    image: "https://images.unsplash.com/photo-1544256718-3bcf237f3974?w=800&h=400&fit=crop",
+    imageAlt: "Digital code flowing fast in green on dark background",
     excerpt:
       "Accessible websites use semantic HTML, which means cleaner code, faster page loads, easier maintenance, and lower hosting costs. Good accessibility is good engineering.",
     content: `
@@ -435,8 +435,8 @@ Scan your website to identify where your code could be cleaner, faster, and more
     slug: "brand-reputation-social-responsibility",
     title: "Social Responsibility and Strong Brand Reputation",
     date: "2025-07-15",
-    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=400&fit=crop",
-    imageAlt: "Team meeting discussing corporate social responsibility",
+    image: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=400&fit=crop",
+    imageAlt: "Young audience clapping at a presentation event",
     excerpt:
       "Younger consumers choose brands that align with their values. An accessibility statement and inclusive design signal that your company cares about more than just profit.",
     content: `
@@ -474,8 +474,8 @@ Scan your website today as the first step toward building a reputation for digit
     slug: "government-contracts-b2b-accessibility",
     title: "Unlocking Government Contracts and B2B Partnerships",
     date: "2025-07-17",
-    image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=400&fit=crop",
-    imageAlt: "Business handshake representing partnership",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=400&fit=crop",
+    imageAlt: "Contract signing representing B2B and government deals",
     excerpt:
       "EU public sector bodies are required to buy accessible products. If your software or service isn't accessible, you're automatically disqualified from government tenders and many B2B deals.",
     content: `
@@ -508,8 +508,8 @@ Scan your product today to understand your current compliance level and start bu
     slug: "preventing-reputation-crisis",
     title: "Preventing Reputation Crises and Legal Disputes",
     date: "2025-07-19",
-    image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=400&fit=crop",
-    imageAlt: "Social media notifications representing online reputation",
+    image: "https://plus.unsplash.com/premium_photo-1661486971635-b79537d79d97?w=800&h=400&fit=crop",
+    imageAlt: "Reputation and trust concept with wooden blocks",
     excerpt:
       "Accessibility lawsuits are coming to Europe. But even before legal action, a viral social media post about your inaccessible site can damage your brand faster than any fine.",
     content: `
