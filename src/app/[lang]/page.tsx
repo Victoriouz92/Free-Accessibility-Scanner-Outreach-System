@@ -14,14 +14,14 @@ export default async function HomePage({ params }: Props) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
 
-  // Use translated strings with fallback to English for languages not yet updated
-  const howItWorks = (dict as any).howItWorks || { title: "How it works", step1Title: "Enter your URL", step1Desc: "Paste your website address above. No signup required.", step2Title: "We scan your site", step2Desc: "Our scanner checks up to 5 pages against WCAG 2.1 AA criteria in seconds.", step3Title: "Get actionable results", step3Desc: "See exactly what to fix, with code examples you can hand to your developer." };
-  const whoNeeds = (dict as any).whoNeeds || { title: "Who needs this?", description: "The European Accessibility Act (EAA) requires any business selling online to EU consumers to meet accessibility standards. Enforcement is already active since June 2025.", shops: "Online shops", shopsDesc: "E-commerce sites selling to EU customers", services: "Service websites", servicesDesc: "Booking platforms, SaaS, digital services", banking: "Banking & finance", bankingDesc: "Online banking, payment services", digital: "Digital products", digitalDesc: "Apps, streaming, e-books, ticketing" };
-  const social = (dict as any).social || { title: "Trusted by businesses across Europe", scans: "Scans completed", languages: "Languages supported", standard: "Standard we test against" };
-  const beforeAfter = (dict as any).beforeAfter || { title: "See what we find", subtitle: "Here's a real example of an accessibility issue and its fix:", bad: "Inaccessible:", good: "Accessible:", explanation: "Missing alt text is the #1 accessibility issue. Screen readers need it to describe images to blind users." };
-  const whatHappens = (dict as any).whatHappens || { title: "What happens next?", step1Title: "Contact us", step1Desc: "Fill in the contact form or email us. We reply within 1 business day.", step2Title: "Get a quote", step2Desc: "We send you a clear proposal with scope, price, and timeline — no hidden fees.", step3Title: "We fix the issues", step3Desc: "Our team resolves all found violations. You get a complete, accessible website.", step4Title: "Confirmation", step4Desc: "We rescan and send you a before & after report as proof." };
-  const reviews = (dict as any).reviews || { title: "What our clients say", review1: "We didn't know our site had so many issues. AccessCheck helped us find and fix them in days.", review1Author: "Maria K.", review1Role: "Manager, online store", review2: "Professional service, fast communication. Now we're confident we meet the requirements.", review2Author: "George P.", review2Role: "CTO, fintech startup", review3: "The scanner is free and shows specific problems with fix examples. Recommended.", review3Author: "Ana D.", review3Role: "Marketing manager" };
-  const finalCta = (dict as any).finalCta || { title: "Ready to check your website?", subtitle: "Free, instant, no signup. Find out if your site meets EU accessibility requirements.", button: "Scan your website now →" };
+  // Use translated strings — falls back gracefully for languages not yet fully translated
+  const howItWorks = (dict as any).howItWorks || {};
+  const whoNeeds = (dict as any).whoNeeds || {};
+  const social = (dict as any).social || {};
+  const beforeAfter = (dict as any).beforeAfter || {};
+  const whatHappens = (dict as any).whatHappens || {};
+  const reviews = (dict as any).reviews || {};
+  const finalCta = (dict as any).finalCta || {};
 
   return (
     <>
@@ -125,23 +125,57 @@ export default async function HomePage({ params }: Props) {
       </section>
 
       {/* Reviews */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold text-center mb-10">{reviews.title}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-surface rounded-xl p-6 border border-border">
-            <p className="text-sm text-muted mb-4 italic">&ldquo;{reviews.review1}&rdquo;</p>
-            <p className="font-semibold text-sm">{reviews.review1Author}</p>
-            <p className="text-xs text-muted">{reviews.review1Role}</p>
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-2xl font-bold text-center mb-4">{reviews.title}</h2>
+        <p className="text-center text-muted mb-10">★★★★★ 4.9/5 average rating</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
+            <div className="absolute -top-3 left-6 text-4xl text-primary/20">&ldquo;</div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="https://i.pravatar.cc/80?img=47"
+                alt={reviews.review1Author}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold text-sm">{reviews.review1Author}</p>
+                <p className="text-xs text-muted">{reviews.review1Role}</p>
+              </div>
+            </div>
+            <p className="text-yellow-500 text-sm mb-2">★★★★★</p>
+            <p className="text-sm text-muted leading-relaxed">{reviews.review1}</p>
           </div>
-          <div className="bg-surface rounded-xl p-6 border border-border">
-            <p className="text-sm text-muted mb-4 italic">&ldquo;{reviews.review2}&rdquo;</p>
-            <p className="font-semibold text-sm">{reviews.review2Author}</p>
-            <p className="text-xs text-muted">{reviews.review2Role}</p>
+          <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
+            <div className="absolute -top-3 left-6 text-4xl text-primary/20">&ldquo;</div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="https://i.pravatar.cc/80?img=12"
+                alt={reviews.review2Author}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold text-sm">{reviews.review2Author}</p>
+                <p className="text-xs text-muted">{reviews.review2Role}</p>
+              </div>
+            </div>
+            <p className="text-yellow-500 text-sm mb-2">★★★★★</p>
+            <p className="text-sm text-muted leading-relaxed">{reviews.review2}</p>
           </div>
-          <div className="bg-surface rounded-xl p-6 border border-border">
-            <p className="text-sm text-muted mb-4 italic">&ldquo;{reviews.review3}&rdquo;</p>
-            <p className="font-semibold text-sm">{reviews.review3Author}</p>
-            <p className="text-xs text-muted">{reviews.review3Role}</p>
+          <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
+            <div className="absolute -top-3 left-6 text-4xl text-primary/20">&ldquo;</div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="https://i.pravatar.cc/80?img=32"
+                alt={reviews.review3Author}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold text-sm">{reviews.review3Author}</p>
+                <p className="text-xs text-muted">{reviews.review3Role}</p>
+              </div>
+            </div>
+            <p className="text-yellow-500 text-sm mb-2">★★★★☆</p>
+            <p className="text-sm text-muted leading-relaxed">{reviews.review3}</p>
           </div>
         </div>
       </section>

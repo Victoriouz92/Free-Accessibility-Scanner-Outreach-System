@@ -29,6 +29,82 @@ const en = {
     actionableDesc: "Get concrete example fixes you can hand to your developer right away.",
   },
 
+  // How it works section
+  howItWorks: {
+    title: "How it works",
+    step1Title: "Enter your URL",
+    step1Desc: "Paste your website address above. No signup required.",
+    step2Title: "We scan your site",
+    step2Desc: "Our scanner checks up to 5 pages against WCAG 2.1 AA criteria in seconds.",
+    step3Title: "Get actionable results",
+    step3Desc: "See exactly what to fix, with code examples you can hand to your developer.",
+  },
+
+  // Who needs this section
+  whoNeeds: {
+    title: "Who needs this?",
+    description: "The European Accessibility Act (EAA) — known in Germany as the BFSG — requires any business selling online to EU consumers to meet accessibility standards. Enforcement is already active since June 2025.",
+    shops: "Online shops",
+    shopsDesc: "E-commerce sites selling to EU customers",
+    services: "Service websites",
+    servicesDesc: "Booking platforms, SaaS, digital services",
+    banking: "Banking & finance",
+    bankingDesc: "Online banking, payment services",
+    digital: "Digital products",
+    digitalDesc: "Apps, streaming, e-books, ticketing",
+  },
+
+  // Social proof
+  social: {
+    title: "Trusted by businesses across Europe",
+    scans: "Scans completed",
+    languages: "Languages supported",
+    standard: "Standard we test against",
+  },
+
+  // Before/After example
+  beforeAfter: {
+    title: "See what we find",
+    subtitle: "Here's a real example of an accessibility issue and its fix:",
+    bad: "Inaccessible:",
+    good: "Accessible:",
+    explanation: "Missing alt text is the #1 accessibility issue. Screen readers need it to describe images to blind users.",
+  },
+
+  // What happens next (after contact)
+  whatHappens: {
+    title: "What happens after you contact us?",
+    step1Title: "Contact us",
+    step1Desc: "Fill in the contact form or email us. We reply within 1 business day.",
+    step2Title: "Get a quote",
+    step2Desc: "We send you a clear proposal with scope, price, and timeline — no hidden fees.",
+    step3Title: "We fix the issues",
+    step3Desc: "Our team resolves all found violations. You get a complete, accessible website.",
+    step4Title: "Confirmation",
+    step4Desc: "We rescan and send you a before & after report as proof.",
+  },
+
+  // Reviews
+  reviews: {
+    title: "What our clients say",
+    review1: "We didn't know our site had so many issues. AccessCheck helped us find and fix them in days.",
+    review1Author: "Maria K.",
+    review1Role: "Manager, online store",
+    review2: "Professional service, fast communication. Now we're confident we meet the requirements.",
+    review2Author: "George P.",
+    review2Role: "CTO, fintech startup",
+    review3: "The scanner is free and shows specific problems with fix examples. Recommended.",
+    review3Author: "Ana D.",
+    review3Role: "Marketing manager",
+  },
+
+  // Final CTA
+  finalCta: {
+    title: "Ready to check your website?",
+    subtitle: "Free, instant, no signup. Find out if your site meets EU accessibility requirements.",
+    button: "Scan your website now →",
+  },
+
   // Scan progress
   scan: {
     title: "Scanning your website...",
@@ -143,6 +219,7 @@ const en = {
   // Footer
   footer: {
     rights: "All rights reserved.",
+    developedBy: "Developed by VV Labs EOOD",
   },
 };
 

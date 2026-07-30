@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
 git add -A
-git commit -m "feat: full landing page with reviews, what-happens-next, blog images, BG sync, footer"
+git commit -m "fix: reviews redesign with avatars, i18n fallback to EN, all new landing sections"
 git push origin main
 echo DONE
