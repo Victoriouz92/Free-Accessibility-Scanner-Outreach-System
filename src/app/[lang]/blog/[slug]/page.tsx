@@ -1,4 +1,4 @@
-import { getPostBySlug, getAllPosts } from "@/lib/blog";
+import { getPostBySlug, getAllPosts, getLocalizedPost } from "@/lib/blog";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -37,9 +37,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogArticlePage({ params }: Props) {
   const { lang, slug } = await params;
-  const post = getPostBySlug(slug);
+  const rawPost = getPostBySlug(slug);
 
-  if (!post) notFound();
+  if (!rawPost) notFound();
+
+  const post = getLocalizedPost(rawPost, lang);
 
   return (
     <article className="max-w-3xl mx-auto px-6 py-12">

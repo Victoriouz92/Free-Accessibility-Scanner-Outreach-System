@@ -1,11 +1,8 @@
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, getLocalizedPost } from "@/lib/blog";
 import type { Metadata } from "next";
 
 /**
  * Blog Listing Page
- *
- * WHAT IT IS: Shows all blog articles as cards with title, date, and excerpt.
- * WHY IT EXISTS: Educational content improves SEO and helps visitors understand accessibility.
  */
 
 export const metadata: Metadata = {
@@ -20,7 +17,7 @@ interface Props {
 
 export default async function BlogPage({ params }: Props) {
   const { lang } = await params;
-  const posts = getAllPosts();
+  const posts = getAllPosts().map((p) => getLocalizedPost(p, lang));
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">

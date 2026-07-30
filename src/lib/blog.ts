@@ -6,6 +6,8 @@
  * REAL WORLD ANALOGY: A filing cabinet of articles, each in its own folder.
  */
 
+import { bgTranslations } from "./blog-translations-bg";
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -14,6 +16,7 @@ export interface BlogPost {
   image: string;
   imageAlt: string;
   content: string;
+  translations?: Record<string, { title: string; excerpt: string; content: string }>;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -194,10 +197,31 @@ Accessibility isn't all-or-nothing. Every improvement helps real people use your
 
 /** Get all blog posts sorted by date (newest first) */
 export function getAllPosts(): BlogPost[] {
-  return [...blogPosts].sort((a, b) => b.date.localeCompare(a.date));
+  // Inject translations into posts
+  const postsWithTranslations = blogPosts.map((post) => ({
+    ...post,
+    translations: { bg: bgTranslations[post.slug], ...post.translations },
+  }));
+  return [...postsWithTranslations].sort((a, b) => b.date.localeCompare(a.date));
 }
 
 /** Get a single blog post by slug */
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  return blogPosts.find((post) => post.slug === slug);
+  const post = blogPosts.find((p) => p.slug === slug);
+  if (!post) return undefined;
+  return { ...post, translations: { bg: bgTranslations[post.slug], ...post.translations } };
+}
+
+/** Get a localized version of a post (falls back to English) */
+export function getLocalizedPost(post: BlogPost, locale: string) {
+  const translation = post.translations?.[locale];
+  if (translation) {
+    return {
+      ...post,
+      title: translation.title,
+      excerpt: translation.excerpt,
+      content: translation.content,
+    };
+  }
+  return post; // Fallback to English
 }

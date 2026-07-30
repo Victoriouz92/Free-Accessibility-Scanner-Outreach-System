@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
 git add -A
-git commit -m "fix: reviews redesign with avatars, i18n fallback to EN, all new landing sections"
+git commit -m "feat: blog BG translations, smooth progress counter, i18n deep merge"
 git push origin main
-echo DONE
+del "%~f0"
