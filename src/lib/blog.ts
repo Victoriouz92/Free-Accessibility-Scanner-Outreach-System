@@ -11,6 +11,8 @@ export interface BlogPost {
   title: string;
   date: string;
   excerpt: string;
+  image: string;
+  imageAlt: string;
   content: string;
 }
 
@@ -19,6 +21,8 @@ export const blogPosts: BlogPost[] = [
     slug: "what-is-the-european-accessibility-act",
     title: "What is the European Accessibility Act (EAA)?",
     date: "2025-06-15",
+    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=400&fit=crop",
+    imageAlt: "EU parliament building representing European legislation",
     excerpt:
       "The EAA is EU-wide legislation requiring digital products and services to be accessible. Here's what businesses need to know about deadlines, consequences, and compliance.",
     content: `
@@ -66,6 +70,8 @@ The sooner you start, the less overwhelming it feels. Our free scanner can give 
     slug: "5-most-common-accessibility-issues",
     title: "5 Most Common Accessibility Issues and How to Fix Them",
     date: "2025-06-10",
+    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=400&fit=crop",
+    imageAlt: "Developer fixing code on a laptop screen",
     excerpt:
       "Most websites fail on the same 5 issues. Missing alt text, low contrast, unlabeled forms, keyboard traps, and heading structure. Here's how to fix each one.",
     content: `
@@ -127,6 +133,8 @@ These five issues account for the majority of accessibility failures. Fix them, 
     slug: "how-to-check-if-your-website-is-accessible",
     title: "How to Check if Your Website is Accessible",
     date: "2025-06-05",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop",
+    imageAlt: "Person checking accessibility results on a dashboard",
     excerpt:
       "An introduction to automated vs manual accessibility testing. Learn what tools can catch, what requires human review, and when to hire professional help.",
     content: `

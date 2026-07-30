@@ -46,6 +46,14 @@ export default async function BlogArticlePage({ params }: Props) {
       <a href={`/${lang}/blog`} className="text-sm text-primary hover:underline mb-4 inline-block">
         ← Back to blog
       </a>
+
+      {/* Hero image */}
+      <img
+        src={post.image}
+        alt={post.imageAlt}
+        className="w-full h-64 sm:h-80 object-cover rounded-xl mb-6"
+      />
+
       <time className="block text-sm text-muted mb-2">{post.date}</time>
       <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
 

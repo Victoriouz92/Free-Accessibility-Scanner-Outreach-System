@@ -90,18 +90,26 @@ export default async function LangLayout({
       </main>
 
       <footer className="border-t border-border px-6 py-8 text-sm text-muted">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between gap-4">
-          <p>
-            &copy; {new Date().getFullYear()} AccessCheck. {dict.footer.rights}
+        <div className="max-w-5xl mx-auto flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <p>
+              &copy; {new Date().getFullYear()} AccessCheck. {dict.footer.rights}
+            </p>
+            <nav aria-label="Footer navigation" className="flex gap-4">
+              <a href={`/${lang}/blog`} className="hover:text-primary underline">
+                Blog
+              </a>
+              <a href={`/${lang}/privacy`} className="hover:text-primary underline">
+                {dict.nav.privacy}
+              </a>
+              <a href={`/${lang}/imprint`} className="hover:text-primary underline">
+                {dict.nav.imprint}
+              </a>
+            </nav>
+          </div>
+          <p className="text-xs text-center text-muted/60">
+            Developed by VV Labs ЕООД © 2026
           </p>
-          <nav aria-label="Footer navigation" className="flex gap-4">
-            <a href={`/${lang}/privacy`} className="hover:text-primary underline">
-              {dict.nav.privacy}
-            </a>
-            <a href={`/${lang}/imprint`} className="hover:text-primary underline">
-              {dict.nav.imprint}
-            </a>
-          </nav>
         </div>
       </footer>
     </>

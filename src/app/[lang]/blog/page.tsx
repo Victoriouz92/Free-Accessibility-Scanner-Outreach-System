@@ -34,11 +34,18 @@ export default async function BlogPage({ params }: Props) {
           <a
             key={post.slug}
             href={`/${lang}/blog/${post.slug}`}
-            className="block bg-surface rounded-xl border border-border p-6 card-hover"
+            className="block bg-surface rounded-xl border border-border overflow-hidden card-hover"
           >
-            <time className="text-xs text-muted">{post.date}</time>
-            <h2 className="text-lg font-semibold mt-1 mb-2">{post.title}</h2>
-            <p className="text-sm text-muted">{post.excerpt}</p>
+            <img
+              src={post.image}
+              alt={post.imageAlt}
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-6">
+              <time className="text-xs text-muted">{post.date}</time>
+              <h2 className="text-lg font-semibold mt-1 mb-2">{post.title}</h2>
+              <p className="text-sm text-muted">{post.excerpt}</p>
+            </div>
           </a>
         ))}
       </div>
