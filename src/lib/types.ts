@@ -27,6 +27,7 @@ export interface ScanResult {
   examples: ViolationExample[]; // 2-3 examples for the free report
   pagesScanned: number;
   scanDuration: number; // milliseconds
+  scannedPages?: string[]; // actual URLs that were scanned
 }
 
 // Scan job status (returned by the polling API)

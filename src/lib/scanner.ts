@@ -4,21 +4,16 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- * Scanner Engine
+ * Scanner Engine (v2 — improved reliability)
  *
- * WHAT IT IS: The core that actually visits a website and checks for accessibility issues.
- * WHY IT EXISTS: Gives real, unique results per website using axe-core.
- * REAL WORLD ANALOGY: Like sending an inspector to check a building for code violations.
- *
- * How it works:
- * 1. Launches headless Chromium
- * 2. Visits the submitted URL
- * 3. Finds up to 4 internal links
- * 4. Runs axe-core accessibility checks on each page
- * 5. Combines results into a single report
+ * Improvements over v1:
+ * - Follows redirects and uses the FINAL URL (not what user typed)
+ * - Waits for network idle (catches JS-rendered content)
+ * - Deduplicates violations across pages (same rule on 5 pages = 1 issue, not 5)
+ * - Returns the actual scanned page URLs in the result
+ * - Adds best-practice checks for more complete coverage
  */
 
-// Map axe-core impact levels to our severity type
 const IMPACT_TO_SEVERITY: Record<string, Severity> = {
   critical: "critical",
   serious: "serious",
@@ -33,46 +28,48 @@ export async function runScan(url: string): Promise<ScanResult> {
   try {
     console.log(`[Scanner] Starting scan for: ${url}`);
 
-    // Launch headless browser
     browser = await chromium.launch({ headless: true });
     console.log(`[Scanner] Chromium launched successfully`);
+
     const context = await browser.newContext({
       userAgent:
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       viewport: { width: 1280, height: 720 },
     });
+    context.setDefaultTimeout(20000);
 
-    context.setDefaultTimeout(15000);
     const page = await context.newPage();
 
-    // Visit the main URL — wait for network to be mostly idle
+    // Navigate and follow all redirects — use networkidle for full JS rendering
     console.log(`[Scanner] Navigating to: ${url}`);
-    await page.goto(url, { waitUntil: "load", timeout: 30000 });
+    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
 
-    // Give the page a moment to finish rendering JS
-    await page.waitForTimeout(2000);
-
-    // Collect internal page URLs from the navigation (up to 4)
-    const internalUrls = await findInternalLinks(page, url);
-    console.log(`[Scanner] Found ${internalUrls.length} internal links`);
+    // Get the FINAL URL after all redirects
+    const finalUrl = page.url();
+    console.log(`[Scanner] Final URL after redirects: ${finalUrl}`);
 
     // Run axe-core on the main page
     console.log(`[Scanner] Running axe-core on main page...`);
-    const mainViolations = await scanPage(page, url);
+    const mainViolations = await scanPage(page, finalUrl);
     console.log(`[Scanner] Main page: ${mainViolations.length} violation types found`);
 
+    // Track which pages were scanned
+    const scannedPages = [finalUrl];
     const allViolations = [...mainViolations];
 
-    // Scan additional internal pages (up to 4)
+    // Find and scan internal pages
+    const internalUrls = await findInternalLinks(page, finalUrl);
+    console.log(`[Scanner] Found ${internalUrls.length} internal links`);
+
     const pagesToScan = internalUrls.slice(0, 4);
     for (const pageUrl of pagesToScan) {
       try {
         console.log(`[Scanner] Scanning internal page: ${pageUrl}`);
-        await page.goto(pageUrl, { waitUntil: "load", timeout: 15000 });
-        await page.waitForTimeout(1000);
+        await page.goto(pageUrl, { waitUntil: "networkidle", timeout: 15000 });
         const pageViolations = await scanPage(page, pageUrl);
         console.log(`[Scanner] Internal page: ${pageViolations.length} violation types`);
         allViolations.push(...pageViolations);
+        scannedPages.push(page.url()); // Use final URL after any redirects
       } catch (err) {
         console.log(`[Scanner] Skipping page (error): ${pageUrl} - ${err}`);
         continue;
@@ -82,22 +79,24 @@ export async function runScan(url: string): Promise<ScanResult> {
     await browser.close();
     browser = null;
 
-    // Process results
-    const issues = countBySeverity(allViolations);
-    const totalIssues = issues.critical + issues.serious + issues.moderate + issues.minor;
-    const score = calculateScore(issues, totalIssues);
+    // Deduplicate: count unique violations, not repeats across pages
+    const dedupedIssues = countDeduplicated(allViolations);
+    const totalIssues = dedupedIssues.critical + dedupedIssues.serious + dedupedIssues.moderate + dedupedIssues.minor;
+    const score = calculateScore(dedupedIssues, totalIssues);
     const examples = pickExamples(allViolations);
 
-    console.log(`[Scanner] Done! Score: ${score}, Total issues: ${totalIssues}`);
-    console.log(`[Scanner] Breakdown: C=${issues.critical} S=${issues.serious} M=${issues.moderate} m=${issues.minor}`);
+    console.log(`[Scanner] Done! Score: ${score}, Total issues: ${totalIssues} (deduplicated)`);
+    console.log(`[Scanner] Breakdown: C=${dedupedIssues.critical} S=${dedupedIssues.serious} M=${dedupedIssues.moderate} m=${dedupedIssues.minor}`);
+    console.log(`[Scanner] Pages scanned: ${scannedPages.join(", ")}`);
 
     return {
-      url,
+      url: finalUrl, // Store the FINAL URL, not what user typed
       score,
-      issues,
+      issues: dedupedIssues,
       examples,
-      pagesScanned: 1 + pagesToScan.length,
+      pagesScanned: scannedPages.length,
       scanDuration: Date.now() - startTime,
+      scannedPages, // New: list of actual scanned URLs
     };
   } catch (error) {
     if (browser) await browser.close();
@@ -107,28 +106,22 @@ export async function runScan(url: string): Promise<ScanResult> {
 }
 
 /**
- * Run axe-core on the current page by injecting the script directly.
- * This is more reliable than the @axe-core/playwright wrapper.
+ * Run axe-core on the current page.
+ * Includes WCAG 2.1 AA + best-practice rules for comprehensive coverage.
  */
 async function scanPage(page: Page, pageUrl: string): Promise<AxeViolation[]> {
   try {
-    // Read axe-core source and inject it into the page
-    const axeCorePath = path.resolve(
-      process.cwd(),
-      "node_modules/axe-core/axe.min.js"
-    );
+    const axeCorePath = path.resolve(process.cwd(), "node_modules/axe-core/axe.min.js");
     const axeSource = fs.readFileSync(axeCorePath, "utf-8");
 
-    // Inject axe-core
     await page.evaluate(axeSource);
 
-    // Run axe analysis
     const results = await page.evaluate(() => {
       // @ts-expect-error - axe is injected globally
       return window.axe.run(document, {
         runOnly: {
           type: "tag",
-          values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+          values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"],
         },
       });
     });
@@ -141,6 +134,7 @@ async function scanPage(page: Page, pageUrl: string): Promise<AxeViolation[]> {
       help: v.help,
       helpUrl: v.helpUrl,
       id: v.id,
+      pageUrl,
       nodes: v.nodes.map((n: any) => ({
         html: n.html,
         target: n.target.join(", "),
@@ -154,15 +148,13 @@ async function scanPage(page: Page, pageUrl: string): Promise<AxeViolation[]> {
 }
 
 /**
- * Find internal links on the page (same domain, from nav or main content).
- * Returns up to 4 unique URLs.
+ * Find internal links (same domain) from the page.
  */
 async function findInternalLinks(page: Page, baseUrl: string): Promise<string[]> {
   try {
     const baseOrigin = new URL(baseUrl).origin;
 
     const links = await page.evaluate((origin: string) => {
-      // Look for links in nav, header, and main areas
       const anchors = Array.from(
         document.querySelectorAll("nav a[href], header a[href], main a[href], a[href]")
       );
@@ -185,7 +177,6 @@ async function findInternalLinks(page: Page, baseUrl: string): Promise<string[]>
       return [...new Set(urls)];
     }, baseOrigin);
 
-    // Filter out the base URL
     return links
       .filter((link) => link !== baseUrl && link !== baseUrl + "/")
       .slice(0, 4);
@@ -196,14 +187,32 @@ async function findInternalLinks(page: Page, baseUrl: string): Promise<string[]>
 }
 
 /**
- * Count violations by severity level.
+ * Count violations with deduplication.
+ * Same violation type (e.g. "image-alt") on multiple pages counts
+ * total affected elements, but doesn't unfairly multiply the score.
+ * Each unique rule counts its nodes across all pages, but capped per rule.
  */
-function countBySeverity(violations: AxeViolation[]) {
+function countDeduplicated(violations: AxeViolation[]) {
   const counts = { critical: 0, serious: 0, moderate: 0, minor: 0 };
 
+  // Group by rule ID
+  const byRule = new Map<string, { impact: string; totalNodes: number }>();
+
   for (const v of violations) {
-    const severity = IMPACT_TO_SEVERITY[v.impact] || "minor";
-    counts[severity] += v.nodes.length;
+    const existing = byRule.get(v.id);
+    if (existing) {
+      existing.totalNodes += v.nodes.length;
+    } else {
+      byRule.set(v.id, { impact: v.impact, totalNodes: v.nodes.length });
+    }
+  }
+
+  // Count: each rule contributes its capped node count
+  for (const [, rule] of byRule) {
+    const severity = IMPACT_TO_SEVERITY[rule.impact] || "minor";
+    // Cap at 10 per rule type — prevents one repeated issue from dominating
+    const cappedCount = Math.min(rule.totalNodes, 10);
+    counts[severity] += cappedCount;
   }
 
   return counts;
@@ -211,8 +220,7 @@ function countBySeverity(violations: AxeViolation[]) {
 
 /**
  * Calculate accessibility score (0-100).
- * Higher = fewer/less severe issues.
- * Uses a logarithmic curve so scores spread more naturally.
+ * Exponential curve — drops fast at first, then levels off.
  */
 function calculateScore(
   issues: { critical: number; serious: number; moderate: number; minor: number },
@@ -220,32 +228,28 @@ function calculateScore(
 ): number {
   if (totalIssues === 0) return 100;
 
-  // Weighted penalty — but scaled more gently
   const weightedIssues =
     issues.critical * 4 +
     issues.serious * 2 +
     issues.moderate * 1 +
     issues.minor * 0.5;
 
-  // Use a curve: score drops quickly at first, then levels off
-  // 5 weighted issues ≈ 75, 15 ≈ 50, 40 ≈ 25, 80+ ≈ ~5
+  // Curve: 5≈85, 10≈72, 20≈51, 40≈26, 60+≈<15
   const score = Math.round(100 * Math.exp(-weightedIssues / 30));
   return Math.max(5, Math.min(100, score));
 }
 
 /**
- * Pick 2-3 of the most impactful violations for the free report.
+ * Pick 2-3 most impactful examples for the free report.
  */
 function pickExamples(violations: AxeViolation[]): ViolationExample[] {
   if (violations.length === 0) return [];
 
-  // Sort by severity (worst first)
   const sorted = [...violations].sort((a, b) => {
     const order = { critical: 0, serious: 1, moderate: 2, minor: 3 };
     return (order[a.impact as keyof typeof order] ?? 3) - (order[b.impact as keyof typeof order] ?? 3);
   });
 
-  // Pick up to 3 unique violation types
   const seen = new Set<string>();
   const examples: ViolationExample[] = [];
 
@@ -268,9 +272,6 @@ function pickExamples(violations: AxeViolation[]): ViolationExample[] {
   return examples;
 }
 
-/**
- * Generate a simple fix suggestion based on the violation type.
- */
 function generateFixSuggestion(ruleId: string, html: string): string {
   const truncated = truncateHtml(html);
 
@@ -297,32 +298,27 @@ function generateFixSuggestion(ruleId: string, html: string): string {
       return "Add a <main> element to wrap your primary page content";
     case "page-has-heading-one":
       return "Add an <h1> heading as the main title of the page";
-    case "list":
-      return "Use proper list markup (<ul>/<ol> with <li> children)";
-    case "listitem":
-      return "Ensure <li> elements are direct children of <ul> or <ol>";
     case "meta-viewport":
-      return '<meta name="viewport" content="width=device-width, initial-scale=1"> (without maximum-scale=1 or user-scalable=no)';
+      return '<meta name="viewport" content="width=device-width, initial-scale=1"> (without user-scalable=no)';
+    case "link-in-text-block":
+      return "Make links visually distinct from surrounding text (not just by color)";
     default:
       return `Fix: see WCAG guidelines for rule "${ruleId}"`;
   }
 }
 
-/**
- * Truncate long HTML so it fits in the report.
- */
 function truncateHtml(html: string): string {
   if (html.length <= 120) return html;
   return html.slice(0, 117) + "...";
 }
 
-// Internal type for processed axe-core violations
 interface AxeViolation {
   impact: string;
   description: string;
   help: string;
   helpUrl: string;
   id: string;
+  pageUrl?: string;
   nodes: {
     html: string;
     target: string;

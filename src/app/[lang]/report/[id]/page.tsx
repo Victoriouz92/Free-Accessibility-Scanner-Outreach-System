@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import type { Locale } from "@/lib/i18n/config";
 import { PaymentButton } from "@/components/payment-button";
+import { CopyButton } from "@/components/copy-button";
 
 /**
  * Paid Report Page (translated)
@@ -49,7 +50,9 @@ export default async function ReportPage({ params, searchParams }: Props) {
   return (
     <section className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="text-2xl font-bold mb-2">{tierName}</h1>
-      <p className="text-muted mb-8">Scan ID: {id}</p>
+      <div className="mb-8">
+        <CopyButton text={id} label="Scan ID:" />
+      </div>
 
       <div className="bg-surface rounded-xl border border-border p-8 text-center shadow-sm">
         <h2 className="text-xl font-semibold mb-4">{dict.paidReport.unlockTitle}</h2>

@@ -30,11 +30,12 @@ export async function POST(request: NextRequest) {
     const normalizedUrl = url.replace(/\/+$/, "").toLowerCase();
 
     // Check for a recent completed scan of this URL (within 24h)
+    // Also check the base domain in case the stored URL is the post-redirect version
     const cutoff = new Date(Date.now() - CACHE_DURATION_MS).toISOString();
     const { data: cachedScan } = await supabaseAdmin
       .from("scans")
       .select("id, created_at")
-      .eq("url", normalizedUrl)
+      .or(`url.eq.${normalizedUrl},url.ilike.${normalizedUrl}%`)
       .eq("status", "complete")
       .gte("created_at", cutoff)
       .order("created_at", { ascending: false })
@@ -89,6 +90,7 @@ async function runScanAndStore(scanId: string, url: string) {
       .from("scans")
       .update({
         status: "complete",
+        url: result.url, // Store the FINAL URL (after redirects)
         score: result.score,
         issues_critical: result.issues.critical,
         issues_serious: result.issues.serious,

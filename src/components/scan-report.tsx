@@ -2,6 +2,7 @@
 
 import { SeverityBadge } from "@/components/severity-badge";
 import { ScoreDisplay } from "@/components/score-display";
+import { CopyButton } from "@/components/copy-button";
 import type { ScanResult } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 
@@ -23,8 +24,16 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
       {/* Score + Summary */}
       <div className="text-center mb-10">
         <h1 className="text-2xl font-bold mb-2">{dict.report.title}</h1>
-        <p className="text-muted mb-6">{result.url}</p>
+        <p className="text-muted mb-2">{result.url}</p>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <CopyButton text={scanId} label="Scan ID:" />
+        </div>
         <ScoreDisplay score={result.score} dict={dict.report} />
+        {/* Scan metadata */}
+        <p className="text-xs text-muted mt-4">
+          {result.pagesScanned} pages scanned in {(result.scanDuration / 1000).toFixed(1)}s
+          • {new Date().toLocaleDateString()}
+        </p>
       </div>
 
       {/* Cached results notice */}
