@@ -74,7 +74,7 @@ async function generateWithAI(
               content: [
                 {
                   type: "text",
-                  text: `Generate alt text for this image. Page context: "${img.context}". Page URL: ${img.pageUrl}`,
+                  text: `Generate alt text for this image. Context from the page: ${img.context}. Page URL: ${img.pageUrl}. If this looks like a logo or team emblem, include the name.`,
                 },
                 {
                   type: "image_url",
@@ -89,16 +89,16 @@ async function generateWithAI(
 
       if (!response.ok) {
         console.error(`[GenerateAlt] OpenAI API error for ${img.src}:`, response.status);
-        descriptions.push(generateFallback(img));
+        descriptions.push(generateSmartFallback(img));
         continue;
       }
 
       const data = await response.json();
-      const altText = data.choices?.[0]?.message?.content?.trim() || generateFallback(img);
+      const altText = data.choices?.[0]?.message?.content?.trim() || generateSmartFallback(img);
       descriptions.push(altText);
     } catch (err) {
       console.error(`[GenerateAlt] Failed for ${img.src}:`, err);
-      descriptions.push(generateFallback(img));
+      descriptions.push(generateSmartFallback(img));
     }
   }
 
@@ -106,51 +106,125 @@ async function generateWithAI(
 }
 
 /**
- * Fallback: Generate basic descriptions from context when AI is not available.
- * Better than nothing, but should be reviewed manually.
+ * Fallback: Generate descriptions from rich context when AI is not available.
+ * Uses URL patterns, link text, titles, and surrounding content.
  */
 function generateFromContext(
   images: { src: string; context: string; pageUrl: string }[]
 ): string[] {
-  return images.map((img) => generateFallback(img));
+  return images.map((img) => generateSmartFallback(img));
 }
 
 /**
- * Generate a basic fallback description from the image filename and context.
+ * Smart fallback that uses all available hints to generate a useful description.
  */
-function generateFallback(img: { src: string; context: string }): string {
-  // data: URIs don't have useful filenames — use context only
-  if (img.src.startsWith("data:")) {
-    if (img.context && img.context.length > 5) {
-      const shortContext = img.context.slice(0, 60).trim();
-      return `[Review needed] Related to: ${shortContext}`;
-    }
-    return "[Review needed] Inline image — describe manually or use AI";
+function generateSmartFallback(img: { src: string; context: string }): string {
+  // Parse the rich context hints
+  let hints: any = {};
+  try {
+    hints = JSON.parse(img.context);
+  } catch {
+    // Old format — plain text context
+    hints = { containerText: img.context };
   }
 
-  // Try to extract something useful from the filename
+  // Priority 1: Explicit titles/labels (most reliable)
+  if (hints.imgTitle) return hints.imgTitle;
+  if (hints.linkAriaLabel) return hints.linkAriaLabel;
+  if (hints.linkTitle) return hints.linkTitle;
+  if (hints.dataTitle) return hints.dataTitle;
+  if (hints.dataName) return hints.dataName;
+  if (hints.dataCaption) return hints.dataCaption;
+  if (hints.figcaption) return hints.figcaption;
+
+  // Priority 2: Link text (if image is inside a link, the link text describes it)
+  if (hints.linkText && hints.linkText.length > 2 && hints.linkText.length < 80) {
+    return `${hints.linkText}`;
+  }
+
+  // Priority 3: URL path analysis
+  if (hints.urlPath || img.src) {
+    const urlDescription = describeFromUrl(img.src, hints.urlPath);
+    if (urlDescription) return urlDescription;
+  }
+
+  // Priority 4: Filename extraction
+  const filenameDesc = describeFromFilename(img.src);
+  if (filenameDesc) return filenameDesc;
+
+  // Priority 5: Sibling/nearby text
+  if (hints.siblingText && hints.siblingText.length > 3 && hints.siblingText.length < 60) {
+    return `[Review needed] ${hints.siblingText}`;
+  }
+
+  // Priority 6: Container text (broadest, least specific)
+  if (hints.containerText && hints.containerText.length > 5) {
+    const short = hints.containerText.slice(0, 50).trim();
+    return `[Review needed] Related to: ${short}`;
+  }
+
+  return "[Review needed] Image description required";
+}
+
+/**
+ * Analyze URL path for patterns that suggest what the image is.
+ */
+function describeFromUrl(src: string, urlPath: string): string | null {
+  const path = urlPath || (() => { try { return new URL(src).pathname; } catch { return ""; } })();
+  const pathLower = path.toLowerCase();
+
+  // Team/sport logos
+  if (pathLower.includes("/team/") || pathLower.includes("/club/")) {
+    return "[Review needed] Team logo or emblem";
+  }
+  if (pathLower.includes("/league/") || pathLower.includes("/competition/")) {
+    return "[Review needed] League or competition logo";
+  }
+  if (pathLower.includes("/player/")) {
+    return "[Review needed] Player photo";
+  }
+
+  // Common patterns
+  if (pathLower.includes("/logo")) return "[Review needed] Logo";
+  if (pathLower.includes("/avatar")) return "[Review needed] User avatar";
+  if (pathLower.includes("/icon")) return "[Review needed] Icon";
+  if (pathLower.includes("/banner")) return "[Review needed] Banner image";
+  if (pathLower.includes("/hero")) return "[Review needed] Hero image";
+  if (pathLower.includes("/product")) return "[Review needed] Product image";
+  if (pathLower.includes("/profile")) return "[Review needed] Profile photo";
+  if (pathLower.includes("/flag")) return "[Review needed] Flag";
+  if (pathLower.includes("/thumbnail") || pathLower.includes("/thumb")) {
+    return "[Review needed] Thumbnail image";
+  }
+
+  return null;
+}
+
+/**
+ * Extract a description from the filename itself.
+ */
+function describeFromFilename(src: string): string | null {
+  if (src.startsWith("data:")) return null;
+
   try {
-    const url = new URL(img.src);
+    const url = new URL(src);
     const filename = url.pathname.split("/").pop() || "";
     const name = filename
       .replace(/\.[^.]+$/, "") // remove extension
-      .replace(/[-_]+/g, " ") // replace dashes/underscores with spaces
-      .replace(/[0-9]{4,}/g, "") // remove long number sequences
+      .replace(/[-_]+/g, " ") // dashes/underscores to spaces
+      .replace(/[0-9a-f]{8,}/gi, "") // remove UUIDs/hashes
       .replace(/\s+/g, " ")
       .trim();
 
-    if (name.length > 3) {
-      return `[Review needed] ${name}`;
+    // Only use if the cleaned name is meaningful (not just leftover numbers/short strings)
+    if (name.length > 3 && !/^\d+$/.test(name)) {
+      // Capitalize first letter
+      const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+      return capitalized;
     }
   } catch {
     // ignore
   }
 
-  // Use page context if available
-  if (img.context && img.context.length > 5) {
-    const shortContext = img.context.slice(0, 60).trim();
-    return `[Review needed] Related to: ${shortContext}`;
-  }
-
-  return "[Review needed] Image description required";
+  return null;
 }

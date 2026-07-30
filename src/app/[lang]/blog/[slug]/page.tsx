@@ -1,0 +1,100 @@
+import { getPostBySlug, getAllPosts } from "@/lib/blog";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+/**
+ * Individual Blog Article Page
+ *
+ * WHAT IT IS: Renders a single blog post by slug.
+ * WHY IT EXISTS: Each article has its own URL for SEO and sharing.
+ */
+
+interface Props {
+  params: Promise<{ lang: string; slug: string }>;
+}
+
+export async function generateStaticParams() {
+  const posts = getAllPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
+  if (!post) return { title: "Not Found" };
+
+  return {
+    title: `${post.title} — AccessCheck Blog`,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+    },
+  };
+}
+
+export default async function BlogArticlePage({ params }: Props) {
+  const { lang, slug } = await params;
+  const post = getPostBySlug(slug);
+
+  if (!post) notFound();
+
+  return (
+    <article className="max-w-3xl mx-auto px-6 py-12">
+      <a href={`/${lang}/blog`} className="text-sm text-primary hover:underline mb-4 inline-block">
+        ← Back to blog
+      </a>
+      <time className="block text-sm text-muted mb-2">{post.date}</time>
+      <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
+
+      {/* Render content as simple paragraphs and headings */}
+      <div className="prose-content space-y-4">
+        {post.content.split("\n\n").map((block, i) => {
+          if (block.startsWith("## ")) {
+            return (
+              <h2 key={i} className="text-xl font-semibold mt-8 mb-3">
+                {block.replace("## ", "")}
+              </h2>
+            );
+          }
+          if (block.startsWith("```")) {
+            const code = block.replace(/```\w*\n?/g, "");
+            return (
+              <pre key={i} className="bg-gray-100 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+                <code>{code}</code>
+              </pre>
+            );
+          }
+          if (block.startsWith("- ") || block.startsWith("1. ")) {
+            const items = block.split("\n");
+            return (
+              <ul key={i} className="list-disc pl-6 space-y-1 text-sm text-muted">
+                {items.map((item, j) => (
+                  <li key={j}>{item.replace(/^[-\d]+\.?\s/, "")}</li>
+                ))}
+              </ul>
+            );
+          }
+          return (
+            <p key={i} className="text-muted leading-relaxed">
+              {block}
+            </p>
+          );
+        })}
+      </div>
+
+      {/* CTA at bottom */}
+      <div className="mt-12 bg-primary-light rounded-xl p-6 text-center">
+        <p className="font-semibold mb-2">Want to check your website?</p>
+        <a
+          href={`/${lang}`}
+          className="inline-block px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-hover transition-colors"
+        >
+          Scan for free →
+        </a>
+      </div>
+    </article>
+  );
+}

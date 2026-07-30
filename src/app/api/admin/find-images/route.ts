@@ -12,54 +12,71 @@ import { chromium } from "playwright";
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url, singlePage } = await request.json();
 
     if (!url) {
       return NextResponse.json({ error: "URL required" }, { status: 400 });
     }
 
-    console.log(`[FindImages] Starting scan for: ${url}`);
+    console.log(`[FindImages] Starting scan for: ${url} (singlePage: ${!!singlePage})`);
 
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
       userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      viewport: { width: 1280, height: 720 },
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      viewport: { width: 1366, height: 768 },
+      locale: "bg-BG",
+      extraHTTPHeaders: {
+        "Accept-Language": "bg-BG,bg;q=0.9,en;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Sec-CH-UA": '"Chromium";v="126", "Google Chrome";v="126"',
+        "Sec-CH-UA-Platform": '"Windows"',
+      },
     });
-    context.setDefaultTimeout(15000);
+    context.setDefaultTimeout(20000);
     const page = await context.newPage();
 
-    // Visit main page
-    await page.goto(url, { waitUntil: "load", timeout: 30000 });
+    // Navigate — use networkidle to wait for full JS rendering
+    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+
+    // Check if we got redirected
+    const finalUrl = page.url();
+    if (finalUrl !== url) {
+      console.log(`[FindImages] Redirected from ${url} to ${finalUrl}`);
+    }
+
     await page.waitForTimeout(2000);
 
     // Find images on the main page
-    const mainImages = await findImagesOnPage(page, url);
-
-    // Find internal links and scan them too
-    const baseOrigin = new URL(url).origin;
-    const internalLinks = await page.evaluate((origin: string) => {
-      const anchors = Array.from(document.querySelectorAll("a[href]"));
-      const urls: string[] = [];
-      for (const a of anchors) {
-        const href = (a as HTMLAnchorElement).href;
-        if (href.startsWith(origin) && !href.includes("#") && !href.match(/\.(pdf|jpg|png|gif|svg|zip)$/i)) {
-          urls.push(href);
-        }
-      }
-      return [...new Set(urls)].slice(0, 5);
-    }, baseOrigin);
-
-    // Scan internal pages (up to 5)
+    const mainImages = await findImagesOnPage(page, finalUrl);
     const allImages = [...mainImages];
-    for (const link of internalLinks) {
-      try {
-        await page.goto(link, { waitUntil: "load", timeout: 15000 });
-        await page.waitForTimeout(1000);
-        const pageImages = await findImagesOnPage(page, link);
-        allImages.push(...pageImages);
-      } catch {
-        continue;
+
+    // Scan internal pages too (unless single page mode)
+    let pagesScanned = 1;
+    if (!singlePage) {
+      const baseOrigin = new URL(finalUrl).origin;
+      const internalLinks = await page.evaluate((origin: string) => {
+        const anchors = Array.from(document.querySelectorAll("a[href]"));
+        const urls: string[] = [];
+        for (const a of anchors) {
+          const href = (a as HTMLAnchorElement).href;
+          if (href.startsWith(origin) && !href.includes("#") && !href.match(/\.(pdf|jpg|png|gif|svg|zip)$/i)) {
+            urls.push(href);
+          }
+        }
+        return [...new Set(urls)].slice(0, 5);
+      }, baseOrigin);
+
+      for (const link of internalLinks) {
+        try {
+          await page.goto(link, { waitUntil: "load", timeout: 15000 });
+          await page.waitForTimeout(1000);
+          const pageImages = await findImagesOnPage(page, link);
+          allImages.push(...pageImages);
+          pagesScanned++;
+        } catch {
+          continue;
+        }
       }
     }
 
@@ -68,9 +85,9 @@ export async function POST(request: NextRequest) {
     // Deduplicate by src URL
     const unique = deduplicateImages(allImages);
 
-    console.log(`[FindImages] Found ${unique.length} images without alt text across ${1 + internalLinks.length} pages`);
+    console.log(`[FindImages] Found ${unique.length} images without alt text across ${pagesScanned} pages`);
 
-    return NextResponse.json({ images: unique, pagesScanned: 1 + internalLinks.length });
+    return NextResponse.json({ images: unique, pagesScanned });
   } catch (err) {
     console.error("[FindImages] Error:", err);
     return NextResponse.json(
@@ -82,6 +99,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * Find all images on the current page that are missing meaningful alt text.
+ * Extracts rich context from surrounding HTML to help generate better descriptions.
  */
 async function findImagesOnPage(page: any, pageUrl: string) {
   return page.evaluate((currentUrl: string) => {
@@ -93,25 +111,16 @@ async function findImagesOnPage(page: any, pageUrl: string) {
       const src = img.src;
       const rawSrc = img.getAttribute("src") || "";
 
-      // Skip images with no src at all
       if (!src && !rawSrc) continue;
-
-      // Skip only SVG files (not data: URIs — those can be real content)
       if (src.endsWith(".svg") || rawSrc.endsWith(".svg")) continue;
-
-      // Skip truly tiny images (1x1 spacers, tracking pixels)
       if (img.naturalWidth > 0 && img.naturalWidth < 10 && img.naturalHeight < 10) continue;
       if (img.width < 10 && img.height < 10) continue;
 
-      // Flag if alt is missing entirely (null) — this is an accessibility violation
       if (alt === null || alt === undefined) {
-        // Keep full src for preview, truncated version for display
         const fullSrc = src;
-        const displaySrc = src.startsWith("data:")
-          ? src.slice(0, 50) + "..."
-          : src;
+        const displaySrc = src.startsWith("data:") ? src.slice(0, 50) + "..." : src;
 
-        // Build a CSS selector for this image
+        // Build CSS selector
         let selector = "img";
         if (img.id) {
           selector = `#${img.id}`;
@@ -120,7 +129,6 @@ async function findImagesOnPage(page: any, pageUrl: string) {
         } else if (rawSrc && !rawSrc.startsWith("data:")) {
           selector = `img[src="${rawSrc}"]`;
         } else {
-          // Use nth-child for data: images
           const parent = img.parentElement;
           if (parent) {
             const siblings = Array.from(parent.querySelectorAll("img"));
@@ -129,15 +137,60 @@ async function findImagesOnPage(page: any, pageUrl: string) {
           }
         }
 
-        // Get some context (parent element's text)
-        const parent = img.closest("figure, article, section, div");
-        const contextText = parent?.textContent?.trim().slice(0, 100) || "";
+        // === RICH CONTEXT EXTRACTION ===
+
+        // 1. Check title attribute on the image itself
+        const imgTitle = img.getAttribute("title") || "";
+
+        // 2. Check parent <a> for title, aria-label, or text content
+        const parentLink = img.closest("a");
+        const linkTitle = parentLink?.getAttribute("title") || "";
+        const linkAriaLabel = parentLink?.getAttribute("aria-label") || "";
+        const linkText = parentLink?.textContent?.trim().slice(0, 80) || "";
+
+        // 3. Check parent figure/caption
+        const figure = img.closest("figure");
+        const figcaption = figure?.querySelector("figcaption")?.textContent?.trim() || "";
+
+        // 4. Check nearest sibling/adjacent text
+        const nextSibling = img.nextElementSibling;
+        const siblingText = nextSibling?.textContent?.trim().slice(0, 80) || "";
+
+        // 5. Get parent container text (broader context)
+        const container = img.closest("article, section, li, td, div");
+        const containerText = container?.textContent?.trim().slice(0, 120) || "";
+
+        // 6. Check data attributes that might hold useful info
+        const dataName = img.getAttribute("data-name") || "";
+        const dataTitle = img.getAttribute("data-title") || "";
+        const dataCaption = img.getAttribute("data-caption") || "";
+
+        // 7. Check if image is in a known pattern (team logo, avatar, etc.)
+        const urlPath = (() => {
+          try { return new URL(src).pathname; } catch { return ""; }
+        })();
+
+        // Combine all hints into a structured context object
+        const hints = {
+          imgTitle,
+          linkTitle,
+          linkAriaLabel,
+          linkText,
+          figcaption,
+          siblingText,
+          containerText,
+          dataName,
+          dataTitle,
+          dataCaption,
+          urlPath,
+          classes: img.className || "",
+        };
 
         results.push({
           src: fullSrc,
           displaySrc,
           currentAlt: null,
-          context: contextText,
+          context: JSON.stringify(hints),
           selector,
           pageUrl: currentUrl,
         });

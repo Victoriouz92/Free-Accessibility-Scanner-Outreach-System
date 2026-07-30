@@ -3,6 +3,7 @@
 import { SeverityBadge } from "@/components/severity-badge";
 import { ScoreDisplay } from "@/components/score-display";
 import { CopyButton } from "@/components/copy-button";
+import { ShareButton } from "@/components/share-button";
 import type { ScanResult } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 
@@ -27,6 +28,7 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
         <p className="text-muted mb-2">{result.url}</p>
         <div className="flex items-center justify-center gap-2 mb-4">
           <CopyButton text={scanId} label="Scan ID:" />
+          <ShareButton />
         </div>
         <ScoreDisplay score={result.score} dict={dict.report} />
         {/* Scan metadata */}

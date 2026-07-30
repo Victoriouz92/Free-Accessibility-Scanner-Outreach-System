@@ -24,10 +24,30 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const dict = await getDictionary(lang as Locale);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://accesscheck.eu";
 
   return {
     title: `AccessCheck — ${dict.hero.title}`,
     description: dict.hero.subtitle,
+    openGraph: {
+      title: `AccessCheck — ${dict.hero.title}`,
+      description: dict.hero.subtitle,
+      url: `${baseUrl}/${lang}`,
+      siteName: "AccessCheck",
+      locale: lang,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `AccessCheck — ${dict.hero.title}`,
+      description: dict.hero.subtitle,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${lang}`,
+      languages: Object.fromEntries(
+        locales.map((l) => [l, `${baseUrl}/${l}`])
+      ),
+    },
   };
 }
 
@@ -56,7 +76,12 @@ export default async function LangLayout({
           <a href={`/${lang}`} className="text-xl font-bold text-primary">
             {dict.nav.home}
           </a>
-          <LanguageSwitcher currentLang={lang} />
+          <div className="flex items-center gap-4">
+            <a href={`/${lang}/blog`} className="text-sm text-muted hover:text-primary transition-colors">
+              Blog
+            </a>
+            <LanguageSwitcher currentLang={lang} />
+          </div>
         </nav>
       </header>
 

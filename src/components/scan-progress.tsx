@@ -77,9 +77,26 @@ export function ScanProgress({ scanId, lang, dict, cached }: Props) {
     return <ScanReport result={result} scanId={scanId} lang={lang} dict={dict} cached={cached} />;
   }
 
+  const totalSteps = steps.length;
+  const percentage = Math.round(((currentStep + 1) / totalSteps) * 100);
+
   return (
     <div className="text-center py-12">
       <h1 className="text-2xl font-bold mb-8">{dict.scan.title}</h1>
+
+      {/* Percentage progress bar */}
+      <div className="max-w-md mx-auto mb-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm text-muted">Progress</span>
+          <span className="text-sm font-semibold text-primary">{percentage}%</span>
+        </div>
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
 
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {steps[currentStep]}

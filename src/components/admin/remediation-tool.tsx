@@ -33,6 +33,7 @@ export function RemediationTool() {
   const [images, setImages] = useState<ImageIssue[]>([]);
   const [error, setError] = useState("");
   const [scanComplete, setScanComplete] = useState(false);
+  const [singlePage, setSinglePage] = useState(false);
 
   async function handleScan(e: React.FormEvent) {
     e.preventDefault();
@@ -59,18 +60,50 @@ export function RemediationTool() {
       const res = await fetch("/api/admin/find-images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: normalizedUrl }),
+        body: JSON.stringify({ url: normalizedUrl, singlePage }),
       });
 
       if (!res.ok) throw new Error("Scan failed");
 
       const data = await res.json();
-      setImages(data.images.map((img: any) => ({
+      const imagesWithStatus = data.images.map((img: any) => ({
         ...img,
         suggestedAlt: "",
         status: "pending",
-      })));
+      }));
+      setImages(imagesWithStatus);
       setScanComplete(true);
+
+      // Auto-generate descriptions immediately
+      if (imagesWithStatus.length > 0) {
+        setGenerating(true);
+        try {
+          const genRes = await fetch("/api/admin/generate-alt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              images: imagesWithStatus.map((img: any) => ({
+                src: img.src,
+                context: img.context,
+                pageUrl: img.pageUrl,
+              })),
+            }),
+          });
+          if (genRes.ok) {
+            const genData = await genRes.json();
+            setImages((prev) =>
+              prev.map((img, i) => ({
+                ...img,
+                suggestedAlt: genData.descriptions[i] || img.suggestedAlt,
+              }))
+            );
+          }
+        } catch {
+          // Fallback silently — user can still type manually
+        } finally {
+          setGenerating(false);
+        }
+      }
     } catch {
       setError("Failed to scan the website. Make sure the URL is accessible.");
     } finally {
@@ -137,17 +170,19 @@ export function RemediationTool() {
   function handleExport() {
     const approved = images.filter((img) => img.status === "approved" || img.status === "edited");
     const exportText = approved
-      .map((img) =>
-        `<!-- Page: ${img.pageUrl} -->\n<!-- Selector: ${img.selector} -->\n<img src="${img.src}" alt="${img.suggestedAlt}">\n`
+      .map((img, i) =>
+        `[${i + 1}] Page: ${img.pageUrl}\n    Selector: ${img.selector}\n    Image: ${img.displaySrc || img.src}\n    Alt text: "${img.suggestedAlt}"\n`
       )
       .join("\n");
 
+    const header = `AccessCheck - Alt Text Fixes\nGenerated: ${new Date().toISOString()}\nTotal: ${approved.length} images\n${"=".repeat(50)}\n\n`;
+
     // Download as text file
-    const blob = new Blob([exportText], { type: "text/plain" });
+    const blob = new Blob([header + exportText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "alt-text-fixes.html";
+    a.download = "alt-text-fixes.txt";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -157,23 +192,34 @@ export function RemediationTool() {
   return (
     <div>
       {/* URL Input */}
-      <form onSubmit={handleScan} className="flex gap-3 mb-8">
-        <input
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Client website URL (e.g. example.com)"
-          className="flex-1 px-4 py-3 rounded-lg border border-border bg-surface text-base"
-          disabled={scanning}
-        />
-        <button
-          type="submit"
-          disabled={scanning || !url.trim()}
-          className="px-6 py-3 rounded-lg bg-primary text-white font-semibold
-                     hover:bg-primary-hover disabled:opacity-50 transition-colors"
-        >
-          {scanning ? "Scanning..." : "Find images"}
-        </button>
+      <form onSubmit={handleScan} className="mb-8">
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Client website URL (e.g. example.com)"
+            className="flex-1 px-4 py-3 rounded-lg border border-border bg-surface text-base"
+            disabled={scanning}
+          />
+          <button
+            type="submit"
+            disabled={scanning || !url.trim()}
+            className="px-6 py-3 rounded-lg bg-primary text-white font-semibold
+                       hover:bg-primary-hover disabled:opacity-50 transition-colors"
+          >
+            {scanning ? "Scanning..." : "Find images"}
+          </button>
+        </div>
+        <label className="flex items-center gap-2 mt-3 text-sm text-muted cursor-pointer">
+          <input
+            type="checkbox"
+            checked={singlePage}
+            onChange={(e) => setSinglePage(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
+          />
+          Single page only (don&apos;t scan internal links)
+        </label>
       </form>
 
       {error && (
