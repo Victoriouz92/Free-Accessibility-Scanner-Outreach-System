@@ -138,11 +138,7 @@ export default async function HomePage({ params }: Props) {
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
             <div className="absolute -top-3 left-6 text-4xl text-primary/20" aria-hidden="true">&ldquo;</div>
             <div className="flex items-center gap-3 mb-4">
-              <img
-                src="https://i.pravatar.cc/80?img=47"
-                alt={reviews.review1Author}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+              <div className="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-lg" aria-hidden="true">М</div>
               <div>
                 <p className="font-semibold text-sm">{reviews.review1Author}</p>
                 <p className="text-xs text-muted">{reviews.review1Role}</p>
@@ -154,10 +150,12 @@ export default async function HomePage({ params }: Props) {
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
             <div className="absolute -top-3 left-6 text-4xl text-primary/20" aria-hidden="true">&ldquo;</div>
             <div className="flex items-center gap-3 mb-4">
-              <img
-                src="https://i.pravatar.cc/80?img=12"
-                alt={reviews.review2Author}
-                className="w-12 h-12 rounded-full object-cover"
+              <div className="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-lg" aria-hidden="true">Г</div>
+              <div>
+                <p className="font-semibold text-sm">{reviews.review2Author}</p>
+                <p className="text-xs text-muted">{reviews.review2Role}</p>
+              </div>
+            </div>
               />
               <div>
                 <p className="font-semibold text-sm">{reviews.review2Author}</p>
@@ -170,11 +168,7 @@ export default async function HomePage({ params }: Props) {
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
             <div className="absolute -top-3 left-6 text-4xl text-primary/20" aria-hidden="true">&ldquo;</div>
             <div className="flex items-center gap-3 mb-4">
-              <img
-                src="https://i.pravatar.cc/80?img=32"
-                alt={reviews.review3Author}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+              <div className="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-lg" aria-hidden="true">А</div>
               <div>
                 <p className="font-semibold text-sm">{reviews.review3Author}</p>
                 <p className="text-xs text-muted">{reviews.review3Role}</p>
