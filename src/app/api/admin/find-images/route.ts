@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const { url, singlePage } = await request.json();
     if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 });
 
-    const { chromium } = await import("playwright");
+    const { chromium } = await import("playwright-core");
     const bro = await chromium.connectOverCDP(`wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`);
     const context = await bro.newContext({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0", viewport: { width: 1366, height: 768 } });
     context.setDefaultTimeout(20000);

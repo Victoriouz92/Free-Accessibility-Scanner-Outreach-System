@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   // Try to use Playwright (only works on localhost/dedicated server)
   try {
-    const { chromium } = await import("playwright");
+    const { chromium } = await import("playwright-core");
     const browser = await chromium.connectOverCDP(
       `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
     );

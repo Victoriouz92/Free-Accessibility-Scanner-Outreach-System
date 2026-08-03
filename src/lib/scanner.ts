@@ -1,4 +1,4 @@
-import type { Page, Browser } from "playwright";
+import type { Page, Browser } from "playwright-core";
 import type { ScanResult, ViolationExample, Severity } from "./types";
 import * as fs from "fs";
 import * as path from "path";
@@ -34,7 +34,7 @@ export async function runScan(url: string): Promise<ScanResult> {
 
     console.log(`[Scanner] Starting scan for: ${url}`);
 
-    browser = await (await import("playwright")).chromium.connectOverCDP(
+    browser = await (await import("playwright-core")).chromium.connectOverCDP(
       `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
     );
     console.log(`[Scanner] Connected to Browserless`);
