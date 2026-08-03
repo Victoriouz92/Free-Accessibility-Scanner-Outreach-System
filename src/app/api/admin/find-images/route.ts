@@ -14,10 +14,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { chromium } = await import("playwright");
-    const browser = await chromium.connectOverCDP(
-      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
-    );
-
     console.log(`[FindImages] Starting scan for: ${url} (singlePage: ${!!singlePage})`);
 
     const browser = await chromium.connectOverCDP(
