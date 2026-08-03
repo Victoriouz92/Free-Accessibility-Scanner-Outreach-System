@@ -42,7 +42,9 @@ export async function GET(request: NextRequest) {
 
     await browser.close();
 
-    return new NextResponse(pdfBuffer as unknown as BodyInit, {
+    // Convert Buffer to Uint8Array for Next.js Response compatibility
+    const uint8 = new Uint8Array(pdfBuffer);
+    return new NextResponse(uint8, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="accesscheck-report-${scanId.slice(0, 8)}.pdf"`,
