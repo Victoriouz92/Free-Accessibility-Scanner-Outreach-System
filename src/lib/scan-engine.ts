@@ -39,7 +39,7 @@ export async function runScan(url: string): Promise<ScanResult> {
     id: v.id,
     nodes: (v.nodes || []).map((n: any) => ({
       html: n.html || "",
-      target: (n.target || []).join(", "),
+      target: Array.isArray(n.target) ? n.target.join(", ") : (n.target || ""),
       failureSummary: n.failureSummary || "",
     })),
   }));
@@ -77,9 +77,10 @@ function countDeduplicated(violations: AxeViolation[]) {
 }
 
 function calculateScore(issues: any, totalIssues: number): number {
-  if (totalIssues === 0) return 100;
-  const weighted = issues.critical * 4 + issues.serious * 2 + issues.moderate * 1 + issues.minor * 0.5;
-  return Math.max(5, Math.min(100, Math.round(100 * Math.exp(-weighted / 30))));
+  if (!totalIssues || totalIssues === 0) return 100;
+  const weighted = (issues.critical || 0) * 4 + (issues.serious || 0) * 2 + (issues.moderate || 0) * 1 + (issues.minor || 0) * 0.5;
+  const score = Math.round(100 * Math.exp(-weighted / 30));
+  return isNaN(score) ? 50 : Math.max(5, Math.min(100, score));
 }
 
 function pickExamples(violations: AxeViolation[]): ViolationExample[] {

@@ -11,7 +11,7 @@ const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 // Dynamic import — scanner uses Playwright which may not be available on serverless
 async function getScanner() {
-  const { runScan } = await import("@/lib/scanner");
+  const { runScan } = await import("@/lib/scan-engine");
   return runScan;
 }
 
@@ -97,12 +97,12 @@ async function runScanAndStore(scanId: string, url: string) {
       .from("scans")
       .update({
         status: "complete",
-        url: result.url, // Store the FINAL URL (after redirects)
-        score: result.score,
-        issues_critical: result.issues.critical,
-        issues_serious: result.issues.serious,
-        issues_moderate: result.issues.moderate,
-        issues_minor: result.issues.minor,
+        url: result.url || url,
+        score: isNaN(result.score) ? 50 : result.score,
+        issues_critical: result.issues.critical || 0,
+        issues_serious: result.issues.serious || 0,
+        issues_moderate: result.issues.moderate || 0,
+        issues_minor: result.issues.minor || 0,
         examples: result.examples,
         pages_scanned: result.pagesScanned,
         scan_duration: result.scanDuration,
