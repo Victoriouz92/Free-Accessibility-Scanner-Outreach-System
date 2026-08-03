@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { chromium } from "playwright";
 
 /**
- * GET /api/report-pdf?scanId=xxx&tier=free|detailed|full
- *
- * Generates a PDF report for a given scan.
- * - free: summary with score, issues count, 2-3 examples
- * - detailed: all violations grouped by WCAG criterion
- * - full: same as detailed + HTML selectors for developers
+ * GET /api/report-pdf?scanId=xxx&tier=free|detailed|full&view=developer|owner
+ * Dynamic import of playwright for PDF generation.
  */
 
 export async function GET(request: NextRequest) {
   const scanId = request.nextUrl.searchParams.get("scanId");
   const tier = request.nextUrl.searchParams.get("tier") || "free";
+  const view = request.nextUrl.searchParams.get("view") || "developer";
 
   if (!scanId) {
     return NextResponse.json({ error: "scanId required" }, { status: 400 });
   }
 
-  // Fetch scan data from Supabase
   const { data: scan, error } = await supabaseAdmin
     .from("scans")
     .select("*")
@@ -30,32 +25,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Scan not found or incomplete" }, { status: 404 });
   }
 
-  // Generate HTML for the PDF
-  const html = generateReportHtml(scan, tier);
+  const html = generateReportHtml(scan, tier, view);
 
-  // Render to PDF using Playwright
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle" });
+  // Dynamic import — Playwright may not be available on Vercel
+  try {
+    const { chromium } = await import("playwright");
+    const browser = await chromium.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle" });
 
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    margin: { top: "40px", bottom: "60px", left: "40px", right: "40px" },
-    printBackground: true,
-  });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      margin: { top: "40px", bottom: "60px", left: "40px", right: "40px" },
+      printBackground: true,
+    });
 
-  await browser.close();
+    await browser.close();
 
-  // Return PDF
-  return new NextResponse(pdfBuffer, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="accesscheck-report-${scanId.slice(0, 8)}.pdf"`,
-    },
-  });
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="accesscheck-report-${scanId.slice(0, 8)}.pdf"`,
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: "PDF generation not available on this server. Please use localhost." }, { status: 503 });
+  }
 }
 
-function generateReportHtml(scan: any, tier: string): string {
+function generateReportHtml(scan: any, tier: string, view: string): string {
   const score = scan.score ?? 0;
   const issues = {
     critical: scan.issues_critical ?? 0,
@@ -71,21 +69,70 @@ function generateReportHtml(scan: any, tier: string): string {
   let examplesHtml = "";
   if (examples.length > 0) {
     const sectionTitle = tier === "free" ? "Example Issues Found (showing top 3)" : "All Issues Found";
-    examplesHtml = `
-      <h2 style="margin-top: 30px;">${sectionTitle}</h2>
-      ${examples.map((ex: any) => `
-        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;">
-          <p style="margin: 0 0 8px 0;"><strong style="color: ${ex.severity === 'critical' ? '#c0392b' : ex.severity === 'serious' ? '#d35400' : '#b27300'};">${ex.severity.toUpperCase()}</strong> — ${ex.description}</p>
-          ${tier !== "free" && ex.wcagCriterion ? `<p style="font-size: 11px; color: #666; margin: 0 0 8px 0;">WCAG Reference: ${escapeHtml(ex.wcagCriterion)}</p>` : ""}
-          <div style="background: #fef2f2; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px; overflow-wrap: break-word;">
-            <strong>Before:</strong> ${escapeHtml(ex.codeBefore)}
+
+    if (view === "owner") {
+      // Business Owner view — plain language, no code
+      examplesHtml = `
+        <h2 style="margin-top: 30px;">${sectionTitle}</h2>
+        ${examples.map((ex: any) => {
+          const desc = ex.description?.toLowerCase() || "";
+          let title = "Accessibility barrier detected";
+          let impact = ex.description;
+          let risk = "Potential EAA fine, loss of customers";
+          let effort = "Varies";
+
+          if (desc.includes("alt") || desc.includes("image")) {
+            title = "Images cannot be understood by visually impaired visitors";
+            impact = "Blind users hear 'image' without description. They miss content and cannot use image-based buttons.";
+            risk = "EAA fine + loss of ~15% potential customers";
+            effort = "Quick fix (1-2 hours)";
+          } else if (desc.includes("contrast") || desc.includes("color")) {
+            title = "Some text is too hard to read";
+            impact = "Text doesn't stand out from background. Low-vision users and anyone in bright sunlight cannot read.";
+            risk = "Higher bounce rate, EAA non-compliance";
+            effort = "Quick fix (under 1 hour)";
+          } else if (desc.includes("label") || desc.includes("form")) {
+            title = "Form fields cannot be identified by screen readers";
+            impact = "Visitors using screen readers cannot tell what to type in your forms. They abandon the process.";
+            risk = "Lost leads, abandoned forms, EAA violation";
+            effort = "Quick fix (1-2 hours)";
+          } else if (desc.includes("frame") || desc.includes("iframe")) {
+            title = "Embedded content has no description";
+            impact = "Screen readers announce embedded content without context. Users skip potentially important content.";
+            risk = "EAA non-compliance";
+            effort = "Quick fix (add title attribute)";
+          }
+
+          return `
+            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;">
+              <p style="margin: 0 0 8px 0;"><strong style="color: ${ex.severity === 'critical' ? '#c0392b' : ex.severity === 'serious' ? '#d35400' : '#b27300'};">${ex.severity.toUpperCase()}</strong> — ${title}</p>
+              <p style="margin: 0 0 12px 0; font-size: 13px; color: #525252;">${impact}</p>
+              <div style="display: flex; gap: 15px; font-size: 11px;">
+                <div style="flex: 1; background: #f9f9f6; padding: 8px; border-radius: 4px;"><strong>Risk:</strong> ${risk}</div>
+                <div style="flex: 1; background: #f9f9f6; padding: 8px; border-radius: 4px;"><strong>Fix effort:</strong> ${effort}</div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      `;
+    } else {
+      // Developer view — technical with code
+      examplesHtml = `
+        <h2 style="margin-top: 30px;">${sectionTitle}</h2>
+        ${examples.map((ex: any) => `
+          <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;">
+            <p style="margin: 0 0 8px 0;"><strong style="color: ${ex.severity === 'critical' ? '#c0392b' : ex.severity === 'serious' ? '#d35400' : '#b27300'};">${ex.severity.toUpperCase()}</strong> — ${ex.description}</p>
+            ${tier !== "free" && ex.wcagCriterion ? `<p style="font-size: 11px; color: #666; margin: 0 0 8px 0;">WCAG Reference: ${escapeHtml(ex.wcagCriterion)}</p>` : ""}
+            <div style="background: #fef2f2; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px; overflow-wrap: break-word;">
+              <strong>Before:</strong> ${escapeHtml(ex.codeBefore)}
+            </div>
+            <div style="background: #f0fdf4; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">
+              <strong>Fix:</strong> ${escapeHtml(ex.codeAfter)}
+            </div>
           </div>
-          <div style="background: #f0fdf4; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">
-            <strong>Fix:</strong> ${escapeHtml(ex.codeAfter)}
-          </div>
-        </div>
-      `).join("")}
-    `;
+        `).join("")}
+      `;
+    }
   }
 
   const tierBadge = tier === "full" ? "Full Report + Developer Details" : tier === "detailed" ? "Detailed Report" : "Free Summary Report";

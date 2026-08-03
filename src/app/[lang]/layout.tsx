@@ -78,8 +78,14 @@ export default async function LangLayout({
             {dict.nav.home}
           </a>
           <div className="flex items-center gap-2">
-            <a href={`/${lang}/blog`} className="text-sm text-muted hover:text-primary transition-colors">
+            <a href={`/${lang}/blog`} className="text-sm text-muted hover:text-primary transition-colors hidden sm:inline">
               Blog
+            </a>
+            <a href={`/${lang}/compare`} className="text-sm text-muted hover:text-primary transition-colors hidden sm:inline">
+              Compare
+            </a>
+            <a href={`/${lang}/statement-generator`} className="text-sm text-muted hover:text-primary transition-colors hidden lg:inline">
+              Statement
             </a>
             <DarkModeToggle />
             <LanguageSwitcher currentLang={lang} />

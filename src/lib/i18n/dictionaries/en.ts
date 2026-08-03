@@ -161,6 +161,8 @@ const en = {
     detailedReport: "Detailed report — €1",
     fullReport: "Full report + PDF — €3",
     cachedNotice: "These results are from a recent scan. New results will be available in 24 hours.",
+    viewToggleDev: "Developer",
+    viewToggleOwner: "Business Owner",
   },
 
   // Severity labels

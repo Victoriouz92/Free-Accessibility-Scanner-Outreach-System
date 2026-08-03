@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { SeverityBadge } from "@/components/severity-badge";
 import { ScoreDisplay } from "@/components/score-display";
 import { CopyButton } from "@/components/copy-button";
 import { ShareButton } from "@/components/share-button";
 import { LinkedInShareButton } from "@/components/linkedin-share";
+import { ViewToggle, type ViewMode } from "@/components/view-toggle";
+import { translateForOwner } from "@/lib/translate-issues";
 import type { ScanResult } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n/get-dictionary";
 
@@ -21,8 +24,13 @@ interface Props {
 }
 
 export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
+  const [viewMode, setViewMode] = useState<ViewMode>("owner");
+
   return (
     <div>
+      {/* View mode toggle */}
+      <ViewToggle onChange={setViewMode} defaultMode="owner" />
+
       {/* Score + Summary */}
       <section className="text-center mb-10" aria-labelledby="report-title">
         <h1 id="report-title" className="text-2xl font-bold mb-2">{dict.report.title}</h1>
@@ -45,9 +53,9 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
               PDF ▾
             </button>
             <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-surface border border-border rounded-lg shadow-lg py-1 w-52 z-50">
-              <a href={`/api/report-pdf?scanId=${scanId}&tier=free`} className="block px-4 py-2 text-sm hover:bg-primary-light">Free Summary</a>
-              <a href={`/api/report-pdf?scanId=${scanId}&tier=detailed`} className="block px-4 py-2 text-sm hover:bg-primary-light">Detailed Report (€1)</a>
-              <a href={`/api/report-pdf?scanId=${scanId}&tier=full`} className="block px-4 py-2 text-sm hover:bg-primary-light">Full + Developer (€3)</a>
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=free&view=${viewMode}`} className="block px-4 py-2 text-sm hover:bg-primary-light">Free Summary</a>
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=detailed&view=${viewMode}`} className="block px-4 py-2 text-sm hover:bg-primary-light">Detailed Report (€1)</a>
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=full&view=${viewMode}`} className="block px-4 py-2 text-sm hover:bg-primary-light">Full + Developer (€3)</a>
             </div>
           </div>
         </div>
@@ -111,24 +119,55 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
       <section className="bg-surface rounded-xl border border-border p-6 mb-8" aria-labelledby="examples-heading">
         <h2 id="examples-heading" className="text-lg font-semibold mb-4">{dict.report.examplesTitle}</h2>
         <div className="space-y-6">
-          {result.examples.map((example, index) => (
-            <div key={index} className="border-b border-border pb-4 last:border-0 last:pb-0">
-              <div className="flex items-start gap-2 mb-2">
-                <SeverityBadge severity={example.severity} label={dict.severity[example.severity]} />
-                <p className="font-medium">{example.description}</p>
-              </div>
-              <div className="mt-3 space-y-2 text-sm">
-                <div className="bg-red-50 border border-red-200 rounded p-3 font-mono overflow-x-auto">
-                  <span className="text-critical font-semibold">{dict.report.before} </span>
-                  <code>{example.codeBefore}</code>
+          {result.examples.map((example, index) => {
+            if (viewMode === "owner") {
+              // Business Owner view — plain language, no code
+              const ownerIssue = translateForOwner(example);
+              return (
+                <div key={index} className="border-b border-border pb-4 last:border-0 last:pb-0">
+                  <div className="flex items-start gap-2 mb-2">
+                    <SeverityBadge severity={example.severity} label={dict.severity[example.severity]} />
+                    <p className="font-medium">{ownerIssue.title}</p>
+                  </div>
+                  <p className="text-sm text-muted mb-3">{ownerIssue.impact}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-gray-50 rounded p-2">
+                      <p className="font-semibold mb-1">Who is affected</p>
+                      <p className="text-muted">{ownerIssue.whoIsAffected}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded p-2">
+                      <p className="font-semibold mb-1">Business risk</p>
+                      <p className="text-muted">{ownerIssue.businessRisk}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded p-2">
+                      <p className="font-semibold mb-1">Fix effort</p>
+                      <p className="text-muted">{ownerIssue.fixEffort}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-green-50 border border-green-200 rounded p-3 font-mono overflow-x-auto">
-                  <span className="text-primary font-semibold">{dict.report.fix} </span>
-                  <code>{example.codeAfter}</code>
+              );
+            }
+
+            // Developer view — technical, with code
+            return (
+              <div key={index} className="border-b border-border pb-4 last:border-0 last:pb-0">
+                <div className="flex items-start gap-2 mb-2">
+                  <SeverityBadge severity={example.severity} label={dict.severity[example.severity]} />
+                  <p className="font-medium">{example.description}</p>
+                </div>
+                <div className="mt-3 space-y-2 text-sm">
+                  <div className="bg-red-50 border border-red-200 rounded p-3 font-mono overflow-x-auto">
+                    <span className="text-critical font-semibold">{dict.report.before} </span>
+                    <code>{example.codeBefore}</code>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded p-3 font-mono overflow-x-auto">
+                    <span className="text-primary font-semibold">{dict.report.fix} </span>
+                    <code>{example.codeAfter}</code>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

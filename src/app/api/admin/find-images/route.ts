@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { chromium } from "playwright";
 
 /**
  * POST /api/admin/find-images
- *
- * WHAT IT IS: Scans a website and finds ALL images that are missing alt text.
- * WHY IT EXISTS: First step of the remediation workflow — discover the problems.
- *
- * Returns: array of { src, currentAlt, context, selector, pageUrl }
+ * Dynamic import of playwright to avoid build failures on serverless.
  */
 
 export async function POST(request: NextRequest) {
@@ -17,6 +12,9 @@ export async function POST(request: NextRequest) {
     if (!url) {
       return NextResponse.json({ error: "URL required" }, { status: 400 });
     }
+
+    // Dynamic import — Playwright may not be available on Vercel
+    const { chromium } = await import("playwright");
 
     console.log(`[FindImages] Starting scan for: ${url} (singlePage: ${!!singlePage})`);
 

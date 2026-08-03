@@ -27,6 +27,22 @@ export default function AdminPage() {
           </p>
         </a>
 
+        {/* Full Audit Tool */}
+        <a
+          href="/tools/audit"
+          className="bg-surface rounded-xl border border-border p-6 hover:border-primary
+                     transition-colors group"
+        >
+          <p className="text-2xl mb-2">🔍</p>
+          <h3 className="font-bold text-lg mb-1 group-hover:text-primary">
+            Full Accessibility Audit
+          </h3>
+          <p className="text-sm text-muted">
+            Automated manual tests — keyboard nav, zoom, focus, skip links.
+            Generate comprehensive audit report for clients.
+          </p>
+        </a>
+
         {/* Contact Submissions (future) */}
         <div className="bg-surface rounded-xl border border-border p-6 opacity-50">
           <p className="text-2xl mb-2">📬</p>

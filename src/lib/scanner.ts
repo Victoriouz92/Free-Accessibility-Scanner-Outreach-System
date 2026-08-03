@@ -1,4 +1,4 @@
-import { chromium, type Page, type Browser } from "playwright";
+import type { Page, Browser } from "playwright";
 import type { ScanResult, ViolationExample, Severity } from "./types";
 import * as fs from "fs";
 import * as path from "path";
@@ -34,7 +34,7 @@ export async function runScan(url: string): Promise<ScanResult> {
 
     console.log(`[Scanner] Starting scan for: ${url}`);
 
-    browser = await chromium.launch({ headless: true });
+    browser = await (await import("playwright")).chromium.launch({ headless: true });
     console.log(`[Scanner] Chromium launched successfully`);
 
     const context = await browser.newContext({

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { runScan } from "@/lib/scanner";
 
 /**
  * POST /api/scan
@@ -9,6 +8,12 @@ import { runScan } from "@/lib/scanner";
  */
 
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+// Dynamic import — scanner uses Playwright which may not be available on serverless
+async function getScanner() {
+  const { runScan } = await import("@/lib/scanner");
+  return runScan;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,6 +89,7 @@ export async function POST(request: NextRequest) {
 async function runScanAndStore(scanId: string, url: string) {
   try {
     console.log(`[runScanAndStore] Starting scan ${scanId} for ${url}`);
+    const runScan = await getScanner();
     const result = await runScan(url);
     console.log(`[runScanAndStore] Scan complete! Score: ${result.score}, Issues: ${JSON.stringify(result.issues)}`);
 

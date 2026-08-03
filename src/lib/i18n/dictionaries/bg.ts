@@ -147,6 +147,8 @@ const bg = {
     detailedReport: "Подробен доклад — 1€",
     fullReport: "Пълен доклад + PDF — 3€",
     cachedNotice: "Тези резултати са от скорошно сканиране. Нови резултати ще бъдат налични след 24 часа.",
+    viewToggleDev: "Разработчик",
+    viewToggleOwner: "Собственик на бизнес",
   },
 
   severity: {
