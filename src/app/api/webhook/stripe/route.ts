@@ -17,6 +17,10 @@ import { supabaseAdmin } from "@/lib/supabase";
  */
 
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
+  }
+
   try {
     const body = await request.text();
     const signature = request.headers.get("stripe-signature");

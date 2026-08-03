@@ -13,6 +13,10 @@ import { stripe, REPORT_PRICES } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json({ error: "Payments not configured yet" }, { status: 503 });
+    }
+
     const { scanId, tier, lang } = await request.json();
 
     if (!scanId || !tier) {
