@@ -13,12 +13,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "URL required" }, { status: 400 });
     }
 
-    // Dynamic import — Playwright may not be available on Vercel
     const { chromium } = await import("playwright");
+    const browser = await chromium.connectOverCDP(
+      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
+    );
 
     console.log(`[FindImages] Starting scan for: ${url} (singlePage: ${!!singlePage})`);
 
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.connectOverCDP(
+      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
+    );
     const context = await browser.newContext({
       userAgent:
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",

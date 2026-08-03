@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
   // Try to use Playwright (only works on localhost/dedicated server)
   try {
     const { chromium } = await import("playwright");
+    const browser = await chromium.connectOverCDP(
+      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
+    );
     const html = generateReportHtml(scan, tier, view);
-    const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle" });
     const pdfBuffer = await page.pdf({

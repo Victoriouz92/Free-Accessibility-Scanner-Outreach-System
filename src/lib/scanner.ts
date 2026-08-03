@@ -34,8 +34,10 @@ export async function runScan(url: string): Promise<ScanResult> {
 
     console.log(`[Scanner] Starting scan for: ${url}`);
 
-    browser = await (await import("playwright")).chromium.launch({ headless: true });
-    console.log(`[Scanner] Chromium launched successfully`);
+    browser = await (await import("playwright")).chromium.connectOverCDP(
+      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
+    );
+    console.log(`[Scanner] Connected to Browserless`);
 
     const context = await browser.newContext({
       userAgent:
