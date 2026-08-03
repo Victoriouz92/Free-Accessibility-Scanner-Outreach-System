@@ -1,61 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getPageContent } from "@/lib/browserless";
 
 export async function POST(request: NextRequest) {
   try {
     const { url, singlePage } = await request.json();
     if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 });
 
-    const { chromium } = await import("playwright-core");
-    const bro = await chromium.connectOverCDP(`wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`);
-    const context = await bro.newContext({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0", viewport: { width: 1366, height: 768 } });
-    context.setDefaultTimeout(20000);
-    const page = await context.newPage();
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
-    const finalUrl = page.url();
-    await page.waitForTimeout(2000);
+    // Get rendered HTML via Browserless
+    const html = await getPageContent(url);
 
-    const mainImages = await findImages(page, finalUrl);
-    const allImages = [...mainImages];
-    let pagesScanned = 1;
+    // Parse images without alt from the HTML (simple regex approach for serverless)
+    const imgRegex = /<img[^>]*>/gi;
+    const images: any[] = [];
+    let match;
 
-    if (!singlePage) {
-      const baseOrigin = new URL(finalUrl).origin;
-      const links: string[] = await page.evaluate((origin: string) => {
-        return [...new Set(Array.from(document.querySelectorAll("a[href]")).map(a => (a as HTMLAnchorElement).href).filter(h => h.startsWith(origin) && !h.includes("#") && !h.match(/\.(pdf|jpg|png|gif|svg|zip)$/i)))].slice(0, 5);
-      }, baseOrigin);
-      for (const link of links) {
-        try {
-          await page.goto(link, { waitUntil: "load", timeout: 15000 });
-          await page.waitForTimeout(1000);
-          allImages.push(...await findImages(page, link));
-          pagesScanned++;
-        } catch { continue; }
-      }
+    while ((match = imgRegex.exec(html)) !== null) {
+      const tag = match[0];
+      // Skip if has alt attribute
+      if (/alt\s*=/i.test(tag)) continue;
+      // Skip SVGs
+      if (/\.svg/i.test(tag)) continue;
+
+      // Extract src
+      const srcMatch = tag.match(/src\s*=\s*["']([^"']+)["']/i);
+      if (!srcMatch) continue;
+      const src = srcMatch[1];
+      if (src.startsWith("data:") && src.length < 100) continue; // skip tiny data URIs
+
+      images.push({
+        src,
+        displaySrc: src.startsWith("data:") ? src.slice(0, 50) + "..." : src,
+        currentAlt: null,
+        context: "",
+        selector: `img[src="${src.slice(0, 80)}"]`,
+        pageUrl: url,
+      });
     }
 
-    await bro.close();
-    const unique = allImages.filter((img, i, arr) => arr.findIndex(x => x.src === img.src) === i);
-    return NextResponse.json({ images: unique, pagesScanned });
+    // Deduplicate
+    const unique = images.filter((img, i, arr) => arr.findIndex(x => x.src === img.src) === i);
+
+    return NextResponse.json({ images: unique, pagesScanned: 1 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Scan failed" }, { status: 500 });
   }
-}
-
-async function findImages(page: any, pageUrl: string) {
-  return page.evaluate((currentUrl: string) => {
-    return Array.from(document.querySelectorAll("img")).filter(img => {
-      const alt = img.getAttribute("alt");
-      const src = img.src;
-      if (!src || src.endsWith(".svg")) return false;
-      if (img.width < 10 && img.height < 10) return false;
-      return alt === null || alt === undefined;
-    }).map(img => ({
-      src: img.src,
-      displaySrc: img.src.startsWith("data:") ? img.src.slice(0, 50) + "..." : img.src,
-      currentAlt: null,
-      context: JSON.stringify({ linkText: img.closest("a")?.textContent?.trim().slice(0, 80) || "", imgTitle: img.getAttribute("title") || "" }),
-      selector: img.id ? `#${img.id}` : `img[src="${img.getAttribute("src")}"]`,
-      pageUrl: currentUrl,
-    }));
-  }, pageUrl);
 }

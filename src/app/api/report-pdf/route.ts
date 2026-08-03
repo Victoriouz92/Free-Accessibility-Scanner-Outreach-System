@@ -27,21 +27,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Scan not found or incomplete" }, { status: 404 });
   }
 
-  // Try to use Playwright (only works on localhost/dedicated server)
   try {
-    const { chromium } = await import("playwright-core");
-    const browser = await chromium.connectOverCDP(
-      `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
-    );
+    const { generatePdf } = await import("@/lib/browserless");
     const html = generateReportHtml(scan, tier, view);
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle" });
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      margin: { top: "40px", bottom: "60px", left: "40px", right: "40px" },
-      printBackground: true,
-    });
-    await browser.close();
+    const pdfBuffer = await generatePdf(html);
 
     return new Response(pdfBuffer, {
       headers: {
@@ -50,10 +39,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch {
-    return NextResponse.json(
-      { error: "PDF generation requires a dedicated server. Not available on serverless hosting." },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "PDF generation failed" }, { status: 503 });
   }
 }
 
