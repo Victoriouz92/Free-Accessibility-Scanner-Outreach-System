@@ -98,6 +98,21 @@ const en = {
     review3Role: "Marketing manager",
   },
 
+  // Proof section (our own score)
+  proof: {
+    title: "This is what your website should look like",
+    subtitle: "Our own website scores 100/100 on accessibility. But the reality for most websites is very different.",
+    scoreLabel: "AccessCheck.eu score",
+    description: "Every image has alt text. Every form has labels. Every interactive element is keyboard-accessible. Colors meet contrast requirements. Structure follows semantic HTML. This is the standard the European Accessibility Act requires.",
+    noIssues: "0 critical issues • 0 serious issues • Full WCAG 2.1 AA compliance",
+    realityTitle: "But here is the reality...",
+    stat1: "of websites have accessibility errors",
+    stat2: "average errors per homepage",
+    stat3: "of the world population has a disability",
+    source: "Source: WebAIM Million Report 2024 — analysis of 1,000,000 homepages. Most common issues: missing alt text, low contrast, missing form labels.",
+    cta: "Check your website now — it takes 30 seconds",
+  },
+
   // Final CTA
   finalCta: {
     title: "Ready to check your website?",

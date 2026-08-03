@@ -22,6 +22,7 @@ export default async function HomePage({ params }: Props) {
   const whatHappens = (dict as any).whatHappens || {};
   const reviews = (dict as any).reviews || {};
   const finalCta = (dict as any).finalCta || {};
+  const proof = (dict as any).proof || {};
 
   return (
     <>
@@ -130,10 +131,53 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
+      {/* Our own score — proof section */}
+      <section className="max-w-4xl mx-auto px-6 py-16" aria-labelledby="proof-heading">
+        <div className="text-center mb-8">
+          <h2 id="proof-heading" className="text-2xl font-bold mb-3">{proof.title}</h2>
+          <p className="text-muted max-w-2xl mx-auto">{proof.subtitle}</p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-border p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-center gap-8">
+            <div className="text-center">
+              <p className="text-6xl font-bold text-primary">100</p>
+              <p className="text-xs text-muted mt-1">{proof.scoreLabel}</p>
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-semibold mb-2">{proof.noIssues}</p>
+              <p className="text-sm text-muted">{proof.description}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+          <h3 className="text-lg font-bold mb-4 text-critical">{proof.realityTitle}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+            <div>
+              <p className="text-3xl font-bold text-critical">96.3%</p>
+              <p className="text-sm text-muted mt-1">{proof.stat1}</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-critical">50+</p>
+              <p className="text-sm text-muted mt-1">{proof.stat2}</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-critical">~16%</p>
+              <p className="text-sm text-muted mt-1">{proof.stat3}</p>
+            </div>
+          </div>
+          <p className="text-sm text-muted mb-6">{proof.source}</p>
+          <a href={`/${lang}#main-content`} className="inline-block px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-hover transition-colors">
+            {proof.cta}
+          </a>
+        </div>
+      </section>
+
       {/* Reviews */}
       <section className="max-w-5xl mx-auto px-6 py-16" aria-labelledby="reviews-heading">
         <h2 id="reviews-heading" className="text-2xl font-bold text-center mb-4">{reviews.title}</h2>
-        <p className="text-center text-muted mb-10" aria-label="Average rating: 4.9 out of 5 stars"><span aria-hidden="true">★★★★★</span> 4.9/5 average rating</p>
+        <div className="text-center text-muted mb-10" role="img" aria-label="Average rating: 4.9 out of 5 stars"><span aria-hidden="true">★★★★★</span> 4.9/5 average rating</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
             <div className="absolute -top-3 left-6 text-4xl text-primary/20" aria-hidden="true">&ldquo;</div>
@@ -144,7 +188,7 @@ export default async function HomePage({ params }: Props) {
                 <p className="text-xs text-muted">{reviews.review1Role}</p>
               </div>
             </div>
-            <p className="text-sm mb-2" aria-label="5 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★★</span></p>
+            <div className="text-sm mb-2" role="img" aria-label="5 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★★</span></div>
             <p className="text-sm text-muted leading-relaxed">{reviews.review1}</p>
           </div>
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
@@ -156,13 +200,7 @@ export default async function HomePage({ params }: Props) {
                 <p className="text-xs text-muted">{reviews.review2Role}</p>
               </div>
             </div>
-              />
-              <div>
-                <p className="font-semibold text-sm">{reviews.review2Author}</p>
-                <p className="text-xs text-muted">{reviews.review2Role}</p>
-              </div>
-            </div>
-            <p className="text-sm mb-2" aria-label="5 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★★</span></p>
+            <div className="text-sm mb-2" role="img" aria-label="5 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★★</span></div>
             <p className="text-sm text-muted leading-relaxed">{reviews.review2}</p>
           </div>
           <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm relative">
@@ -174,7 +212,7 @@ export default async function HomePage({ params }: Props) {
                 <p className="text-xs text-muted">{reviews.review3Role}</p>
               </div>
             </div>
-            <p className="text-sm mb-2" aria-label="4 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★☆</span></p>
+            <div className="text-sm mb-2" role="img" aria-label="4 out of 5 stars"><span className="text-yellow-600" aria-hidden="true">★★★★☆</span></div>
             <p className="text-sm text-muted leading-relaxed">{reviews.review3}</p>
           </div>
         </div>

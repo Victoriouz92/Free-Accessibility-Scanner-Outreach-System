@@ -70,11 +70,13 @@ function generateReportHtml(scan: any, tier: string): string {
 
   let examplesHtml = "";
   if (examples.length > 0) {
+    const sectionTitle = tier === "free" ? "Example Issues Found (showing top 3)" : "All Issues Found";
     examplesHtml = `
-      <h2 style="margin-top: 30px;">Example Issues Found</h2>
+      <h2 style="margin-top: 30px;">${sectionTitle}</h2>
       ${examples.map((ex: any) => `
         <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px;">
           <p style="margin: 0 0 8px 0;"><strong style="color: ${ex.severity === 'critical' ? '#c0392b' : ex.severity === 'serious' ? '#d35400' : '#b27300'};">${ex.severity.toUpperCase()}</strong> — ${ex.description}</p>
+          ${tier !== "free" && ex.wcagCriterion ? `<p style="font-size: 11px; color: #666; margin: 0 0 8px 0;">WCAG Reference: ${escapeHtml(ex.wcagCriterion)}</p>` : ""}
           <div style="background: #fef2f2; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px; overflow-wrap: break-word;">
             <strong>Before:</strong> ${escapeHtml(ex.codeBefore)}
           </div>
@@ -145,6 +147,33 @@ function generateReportHtml(scan: any, tier: string): string {
     <p style="text-align: center; font-size: 14px; color: #525252;">Total: ${total} issues found across ${scan.pages_scanned || 1} pages</p>
 
     ${examplesHtml}
+
+    ${tier !== "free" ? `
+    <h2 style="margin-top: 30px;">Recommendations</h2>
+    <div style="padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 15px;">
+      <h3 style="margin: 0 0 8px; font-size: 14px;">Priority 1: Fix Critical Issues First</h3>
+      <p style="margin: 0; font-size: 13px; color: #525252;">Critical issues prevent some users from accessing your content at all. These should be fixed immediately — typically missing form labels, keyboard traps, and missing alt text on functional images.</p>
+    </div>
+    <div style="padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 15px;">
+      <h3 style="margin: 0 0 8px; font-size: 14px;">Priority 2: Address Serious Issues</h3>
+      <p style="margin: 0; font-size: 13px; color: #525252;">Serious issues make content difficult to use for people with disabilities. Common fixes: improving color contrast ratios, adding descriptive link text, ensuring proper heading hierarchy.</p>
+    </div>
+    <div style="padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; margin-bottom: 15px;">
+      <h3 style="margin: 0 0 8px; font-size: 14px;">Priority 3: Improve Moderate &amp; Minor Issues</h3>
+      <p style="margin: 0; font-size: 13px; color: #525252;">These are best-practice improvements that enhance the experience but are less likely to cause enforcement action. Address them as part of ongoing maintenance.</p>
+    </div>
+    ${tier === "full" ? `
+    <h2 style="margin-top: 30px;">Technical Notes for Developers</h2>
+    <ul style="font-size: 13px; color: #525252; padding-left: 20px;">
+      <li>Use semantic HTML elements (button, nav, main, header, footer) instead of generic divs</li>
+      <li>Ensure all interactive elements are focusable and have visible focus indicators</li>
+      <li>Test with keyboard-only navigation (Tab, Enter, Escape)</li>
+      <li>Run axe-core in your CI/CD pipeline to catch regressions</li>
+      <li>Set lang attribute on the html element matching the page content language</li>
+      <li>Provide skip navigation links for screen reader users</li>
+    </ul>
+    ` : ""}
+    ` : ""}
 
     <div class="cta">
       <p>Need help fixing these issues?</p>

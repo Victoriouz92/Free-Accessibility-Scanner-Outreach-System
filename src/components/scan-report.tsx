@@ -31,18 +31,25 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
           <CopyButton text={scanId} label="Scan ID:" />
           <ShareButton />
           <LinkedInShareButton score={result.score} url={result.url} />
-          <a
-            href={`/api/report-pdf?scanId=${scanId}&tier=free`}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-                       border border-border bg-surface hover:bg-primary-light hover:border-primary
-                       text-muted hover:text-primary transition-colors"
-            aria-label="Download PDF report"
-          >
-            <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span className="hidden sm:inline">PDF</span>
-          </a>
+          {/* PDF download - all tiers (temp: no paywall for testing) */}
+          <div className="relative group">
+            <button
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold
+                         bg-primary text-white hover:bg-primary-hover transition-colors shadow-sm"
+              aria-label="Download PDF report"
+              aria-haspopup="true"
+            >
+              <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              PDF ▾
+            </button>
+            <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-surface border border-border rounded-lg shadow-lg py-1 w-52 z-50">
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=free`} className="block px-4 py-2 text-sm hover:bg-primary-light">Free Summary</a>
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=detailed`} className="block px-4 py-2 text-sm hover:bg-primary-light">Detailed Report (€1)</a>
+              <a href={`/api/report-pdf?scanId=${scanId}&tier=full`} className="block px-4 py-2 text-sm hover:bg-primary-light">Full + Developer (€3)</a>
+            </div>
+          </div>
         </div>
         <ScoreDisplay score={result.score} dict={dict.report} />
         {/* Scan metadata */}

@@ -26,6 +26,12 @@ export async function runScan(url: string): Promise<ScanResult> {
   let browser: Browser | null = null;
 
   try {
+    // Block scanning of localhost/127.0.0.1 (prevents self-scan infinite loops)
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname === "localhost" || parsedUrl.hostname === "127.0.0.1") {
+      throw new Error("Cannot scan localhost — please use a public URL");
+    }
+
     console.log(`[Scanner] Starting scan for: ${url}`);
 
     browser = await chromium.launch({ headless: true });
@@ -36,13 +42,14 @@ export async function runScan(url: string): Promise<ScanResult> {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       viewport: { width: 1280, height: 720 },
     });
-    context.setDefaultTimeout(20000);
+    context.setDefaultTimeout(15000);
 
     const page = await context.newPage();
 
-    // Navigate and follow all redirects — use networkidle for full JS rendering
+    // Navigate — use domcontentloaded + short wait (faster than networkidle)
     console.log(`[Scanner] Navigating to: ${url}`);
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 25000 });
+    await page.waitForTimeout(3000); // Give JS time to render
 
     // Get the FINAL URL after all redirects
     const finalUrl = page.url();
@@ -65,7 +72,8 @@ export async function runScan(url: string): Promise<ScanResult> {
     for (const pageUrl of pagesToScan) {
       try {
         console.log(`[Scanner] Scanning internal page: ${pageUrl}`);
-        await page.goto(pageUrl, { waitUntil: "networkidle", timeout: 15000 });
+        await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 12000 });
+        await page.waitForTimeout(1500);
         const pageViolations = await scanPage(page, pageUrl);
         console.log(`[Scanner] Internal page: ${pageViolations.length} violation types`);
         allViolations.push(...pageViolations);

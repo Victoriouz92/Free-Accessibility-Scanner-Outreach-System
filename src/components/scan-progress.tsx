@@ -121,8 +121,8 @@ export function ScanProgress({ scanId, lang, dict, cached }: Props) {
         {steps.map((step, index) => (
           <div
             key={index}
-            className={`flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-opacity
-              ${index <= currentStep ? "opacity-100" : "opacity-30"}`}
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg text-left
+              ${index <= currentStep ? "" : "text-muted"}`}
           >
             {index < currentStep ? (
               <span className="text-primary" aria-hidden="true">✓</span>
