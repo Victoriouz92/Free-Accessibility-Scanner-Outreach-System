@@ -184,6 +184,41 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
           </div>
         </div>
       </section>
+
+      {/* What we check vs what needs manual review */}
+      <section className="mt-12 bg-surface rounded-xl border border-border p-6" aria-labelledby="coverage-heading">
+        <h2 id="coverage-heading" className="text-lg font-semibold mb-4">What our scanner checks</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 mb-6">
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Color contrast (WCAG AA 4.5:1)</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Image alt text</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Form labels and inputs</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Button and link names</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Keyboard navigation structure</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> ARIA attributes and roles</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Heading hierarchy</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Landmark regions</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Language attribute</div>
+          <div className="flex items-center gap-2 text-sm"><span className="text-primary" aria-hidden="true">✓</span> Flashing/blinking content</div>
+        </div>
+
+        <h3 className="text-sm font-semibold mb-3 text-muted">Requires expert manual review:</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 mb-6">
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> Behavior at 200% browser zoom</div>
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> Real screen reader experience</div>
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> PDF document accessibility</div>
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> Complex widget interaction (modals, datepickers)</div>
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> Content readability and plain language</div>
+          <div className="flex items-center gap-2 text-sm text-muted"><span aria-hidden="true">○</span> Meaningful alt text accuracy</div>
+        </div>
+
+        <div className="bg-primary-light rounded-lg p-4">
+          <p className="text-sm">
+            <strong>Our automated scan covers ~80% of detectable accessibility issues.</strong>{" "}
+            For full EAA/WCAG compliance certification, a manual expert audit is recommended.{" "}
+            <a href={`/${lang}/contact`} className="text-primary underline font-medium">Request a full audit →</a>
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

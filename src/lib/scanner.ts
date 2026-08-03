@@ -129,7 +129,7 @@ async function scanPage(page: Page, pageUrl: string): Promise<AxeViolation[]> {
       return window.axe.run(document, {
         runOnly: {
           type: "tag",
-          values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"],
+          values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22a", "wcag22aa", "best-practice"],
         },
       });
     });

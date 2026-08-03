@@ -101,6 +101,9 @@ export default async function LangLayout({
               <a href={`/${lang}/blog`} className="hover:text-primary underline">
                 Blog
               </a>
+              <a href={`/${lang}/terms`} className="hover:text-primary underline">
+                Terms
+              </a>
               <a href={`/${lang}/privacy`} className="hover:text-primary underline">
                 {dict.nav.privacy}
               </a>
