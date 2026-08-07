@@ -1,10 +1,13 @@
 const bg = {
   nav: {
     home: "AccessCheck",
+    blog: "Блог",
+    compare: "Сравнение",
+    statement: "Декларация",
+    terms: "Условия",
     privacy: "Поверителност",
     imprint: "Импресум",
     skipToContent: "Премини към основното съдържание",
-    blog: "Блог",
   },
 
   hero: {

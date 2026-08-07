@@ -2,6 +2,10 @@ const en = {
   // Navigation
   nav: {
     home: "AccessCheck",
+    blog: "Blog",
+    compare: "Compare",
+    statement: "Statement",
+    terms: "Terms",
     privacy: "Privacy Policy",
     imprint: "Imprint",
     skipToContent: "Skip to main content",

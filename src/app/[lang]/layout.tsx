@@ -81,13 +81,13 @@ export default async function LangLayout({
           </a>
           <div className="flex items-center gap-1">
             <a href={`/${lang}/blog`} className="px-3 py-2 text-sm font-medium text-muted hover:text-primary transition-colors hidden sm:inline">
-              Blog
+              {dict.nav.blog}
             </a>
             <a href={`/${lang}/compare`} className="px-3 py-2 text-sm font-medium text-muted hover:text-primary transition-colors hidden sm:inline">
-              Compare
+              {dict.nav.compare}
             </a>
             <a href={`/${lang}/statement-generator`} className="px-3 py-2 text-sm font-medium text-muted hover:text-primary transition-colors hidden lg:inline">
-              Statement
+              {dict.nav.statement}
             </a>
             <DarkModeToggle />
             <LanguageSwitcher currentLang={lang} />
@@ -107,10 +107,10 @@ export default async function LangLayout({
             </p>
             <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-5 gap-y-2">
               <a href={`/${lang}/blog`} className="hover:text-primary transition-colors">
-                Blog
+                {dict.nav.blog}
               </a>
               <a href={`/${lang}/terms`} className="hover:text-primary transition-colors">
-                Terms
+                {dict.nav.terms}
               </a>
               <a href={`/${lang}/privacy`} className="hover:text-primary transition-colors">
                 {dict.nav.privacy}
