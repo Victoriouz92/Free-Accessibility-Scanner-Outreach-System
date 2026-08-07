@@ -69,8 +69,8 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
 
       {/* Cached results notice with re-scan option */}
       {cached && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 text-center" role="note">
-          <p className="text-sm text-yellow-800 mb-2">
+        <div className="bg-moderate/8 border border-moderate/25 rounded-xl p-4 mb-8 text-center" role="note">
+          <p className="text-sm text-moderate mb-2">
             <span aria-hidden="true">⏱️</span> {dict.report.cachedNotice}
           </p>
           <button
@@ -131,15 +131,15 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
                   </div>
                   <p className="text-sm text-muted mb-3">{ownerIssue.impact}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="bg-gray-50 rounded p-2">
+                    <div className="bg-primary/6 rounded p-2">
                       <p className="font-semibold mb-1">Who is affected</p>
                       <p className="text-muted">{ownerIssue.whoIsAffected}</p>
                     </div>
-                    <div className="bg-gray-50 rounded p-2">
+                    <div className="bg-primary/6 rounded p-2">
                       <p className="font-semibold mb-1">Business risk</p>
                       <p className="text-muted">{ownerIssue.businessRisk}</p>
                     </div>
-                    <div className="bg-gray-50 rounded p-2">
+                    <div className="bg-primary/6 rounded p-2">
                       <p className="font-semibold mb-1">Fix effort</p>
                       <p className="text-muted">{ownerIssue.fixEffort}</p>
                     </div>
@@ -156,11 +156,11 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
                   <p className="font-medium">{example.description}</p>
                 </div>
                 <div className="mt-3 space-y-2 text-sm">
-                  <div className="bg-red-50 border border-red-200 rounded p-3 font-mono overflow-x-auto">
+                  <div className="bg-critical/8 border border-critical/25 rounded p-3 font-mono overflow-x-auto">
                     <span className="text-critical font-semibold">{dict.report.before} </span>
                     <code>{example.codeBefore}</code>
                   </div>
-                  <div className="bg-green-50 border border-green-200 rounded p-3 font-mono overflow-x-auto">
+                  <div className="bg-primary/8 border border-primary/25 rounded p-3 font-mono overflow-x-auto">
                     <span className="text-primary font-semibold">{dict.report.fix} </span>
                     <code>{example.codeAfter}</code>
                   </div>

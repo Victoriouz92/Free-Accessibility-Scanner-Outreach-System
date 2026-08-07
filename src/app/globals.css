@@ -1,35 +1,33 @@
 @import "tailwindcss";
 
-/* 
-  AccessCheck Design Tokens
-  - Warm, calm, professional tone
-  - Primary: warm teal (friendly, trustworthy)
-  - Background: off-white with subtle gradient
-  - Severity colors: traffic-light scheme (always paired with icons + text)
+/*
+  AccessCheck Design Tokens — VV Labs brand system
+  Deep navy + electric blue, shared with vv-labs.website
+  Severity colors stay saturated and distinct in both themes (WCAG requirement)
 */
 
 @theme inline {
-  --color-background: #FAF9F6;
-  --color-foreground: #1a1a2e;
+  --color-background: #F7F9FC;
+  --color-foreground: #0B1220;
 
-  /* Primary brand color - warm teal */
-  --color-primary: #1a7a6e;
-  --color-primary-hover: #156b60;
-  --color-primary-light: #e8f5f3;
+  /* Primary brand color — electric blue */
+  --color-primary: #2557E8;
+  --color-primary-hover: #1B44C4;
+  --color-primary-light: #E9EFFE;
 
   /* Severity indicators */
-  --color-critical: #c0392b;
-  --color-serious: #d35400;
-  --color-moderate: #b27300;
-  --color-minor: #7f8c8d;
+  --color-critical: #DC2626;
+  --color-serious: #C2560B;
+  --color-moderate: #A15C00;
+  --color-minor: #64748B;
 
   /* Neutrals */
-  --color-surface: #ffffff;
-  --color-border: #e5e5e5;
-  --color-muted: #525252;
+  --color-surface: #FFFFFF;
+  --color-border: #E3E8F1;
+  --color-muted: #57617A;
 
   /* Typography */
-  --font-sans: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-inter), "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
@@ -40,35 +38,43 @@ body {
   line-height: 1.6;
 }
 
-/* Professional background: subtle dot pattern + gradient */
+/* Editorial background texture: faint grid, no visual noise */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(42, 157, 143, 0.04) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(37, 87, 232, 0.05) 1px, transparent 0);
   background-size: 32px 32px;
 }
 
-/* Gradient accent behind the hero area */
+/* Gradient accent behind hero-style sections */
 .hero-gradient {
   background: linear-gradient(
     135deg,
-    rgba(42, 157, 143, 0.06) 0%,
-    rgba(232, 245, 243, 0.4) 50%,
-    rgba(42, 157, 143, 0.03) 100%
+    rgba(37, 87, 232, 0.07) 0%,
+    rgba(233, 239, 254, 0.5) 50%,
+    rgba(37, 87, 232, 0.03) 100%
   );
 }
 
-/* Focus indicators - visible on every interactive element (WCAG requirement) */
+/* Glass panel — used for nav, floating cards, hero accents */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(11, 18, 32, 0.06);
+}
+
+/* Focus indicators — visible on every interactive element (WCAG requirement) */
 *:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Skip to content link - hidden until focused (accessibility) */
+/* Skip to content link — hidden until focused (accessibility) */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -85,40 +91,78 @@ body::before {
   top: 0;
 }
 
-/* Dark mode overrides */
+/* ============ Dark mode — deep navy, electric blue glow ============ */
+
 .dark body {
-  background-color: #1a1a2e;
-  color: #e8e8e8;
+  background-color: #090D18;
+  color: #EAEFFA;
+}
+
+.dark body::before {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(91, 141, 255, 0.06) 1px, transparent 0);
 }
 
 .dark .bg-surface {
-  background-color: #16213e;
+  background-color: #101830;
 }
 
 .dark .bg-background {
-  background-color: #1a1a2e;
+  background-color: #090D18;
 }
 
 .dark .border-border {
-  border-color: #2a2a4a;
+  border-color: #223055;
 }
 
 .dark .text-muted {
-  color: #a1a1aa;
+  color: #93A0C2;
 }
 
 .dark .text-foreground {
-  color: #f3f4f6;
+  color: #EAEFFA;
+}
+
+.dark .bg-foreground {
+  background-color: #EAEFFA;
+  color: #090D18;
+}
+
+.dark .text-primary {
+  color: #5B8DFF;
+}
+
+.dark .bg-primary {
+  background-color: #2557E8;
+}
+
+.dark .bg-primary-light {
+  background-color: rgba(91, 141, 255, 0.12);
+  color: #8AB0FF;
+}
+
+.dark .border-primary {
+  border-color: #5B8DFF;
 }
 
 .dark .hero-gradient {
   background: linear-gradient(
     135deg,
-    rgba(42, 157, 143, 0.12) 0%,
-    rgba(26, 26, 46, 0.8) 50%,
-    rgba(42, 157, 143, 0.06) 100%
+    rgba(91, 141, 255, 0.14) 0%,
+    rgba(9, 13, 24, 0.9) 50%,
+    rgba(91, 141, 255, 0.06) 100%
   );
 }
+
+.dark .glass {
+  background: rgba(16, 24, 48, 0.6);
+  border: 1px solid rgba(91, 141, 255, 0.12);
+}
+
+.dark .text-critical { color: #F87171; }
+.dark .text-serious { color: #FB923C; }
+.dark .text-moderate { color: #FBBF24; }
+.dark .text-minor { color: #93A0C2; }
 
 /* Card hover effect */
 .card-hover {
@@ -127,5 +171,9 @@ body::before {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgba(42, 157, 143, 0.1), 0 4px 10px -3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 25px -5px rgba(37, 87, 232, 0.12), 0 4px 10px -3px rgba(0, 0, 0, 0.05);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 8px 30px -5px rgba(91, 141, 255, 0.18), 0 4px 12px -3px rgba(0, 0, 0, 0.3);
 }

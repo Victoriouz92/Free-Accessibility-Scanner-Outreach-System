@@ -236,7 +236,17 @@ const en = {
   // Footer
   footer: {
     rights: "All rights reserved.",
-    developedBy: "Developed by VV Labs EOOD",
+    developedBy: "Developed by VV Labs",
+  },
+
+  // Blog listing page
+  blog: {
+    heading: "Blog",
+    subtitle: "Guides and articles about web accessibility, the EAA, and compliance.",
+    readMore: "Read more",
+    backToBlog: "Back to blog",
+    articleCtaTitle: "Want to check your website?",
+    articleCtaButton: "Scan for free",
   },
 };
 

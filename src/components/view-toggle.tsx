@@ -26,14 +26,14 @@ export function ViewToggle({ onChange, defaultMode = "owner" }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-lg p-1 mb-6" role="radiogroup" aria-label="Report view mode">
+    <div className="flex items-center justify-center gap-1 bg-primary/8 rounded-lg p-1 mb-6" role="radiogroup" aria-label="Report view mode">
       <button
         role="radio"
         aria-checked={mode === "owner"}
         onClick={() => handleChange("owner")}
         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
           mode === "owner"
-            ? "bg-white text-foreground shadow-sm"
+            ? "bg-surface text-foreground shadow-sm"
             : "text-muted hover:text-foreground"
         }`}
       >
@@ -45,7 +45,7 @@ export function ViewToggle({ onChange, defaultMode = "owner" }: Props) {
         onClick={() => handleChange("developer")}
         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
           mode === "developer"
-            ? "bg-white text-foreground shadow-sm"
+            ? "bg-surface text-foreground shadow-sm"
             : "text-muted hover:text-foreground"
         }`}
       >

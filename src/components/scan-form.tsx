@@ -85,10 +85,11 @@ export function ScanForm({ lang, dict }: Props) {
         />
         <button
           type="submit"
-          disabled={loading || !url.trim()}
+          disabled={loading}
           className="px-6 py-3 rounded-lg bg-primary text-white font-semibold text-base
-                     hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors min-h-[44px]"
+                     shadow-lg shadow-primary/30 hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/40
+                     hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+                     disabled:hover:scale-100 transition-all min-h-[44px]"
         >
           {loading ? dict.buttonLoading : dict.button}
         </button>

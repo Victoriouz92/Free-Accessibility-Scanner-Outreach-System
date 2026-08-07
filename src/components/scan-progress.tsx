@@ -105,7 +105,7 @@ export function ScanProgress({ scanId, lang, dict, cached }: Props) {
           <span className="text-sm text-muted" id="progress-label">Progress</span>
           <span className="text-sm font-semibold text-primary" aria-hidden="true">{displayPercentage}%</span>
         </div>
-        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={displayPercentage} aria-valuemin={0} aria-valuemax={100} aria-label="Scan progress" aria-labelledby="progress-label">
+        <div className="w-full h-3 bg-primary/10 rounded-full overflow-hidden" role="progressbar" aria-valuenow={displayPercentage} aria-valuemin={0} aria-valuemax={100} aria-label="Scan progress" aria-labelledby="progress-label">
           <div
             className="h-full bg-primary rounded-full transition-all duration-300 ease-linear"
             style={{ width: `${displayPercentage}%` }}

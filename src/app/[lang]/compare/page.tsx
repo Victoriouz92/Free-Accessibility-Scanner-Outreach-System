@@ -95,7 +95,7 @@ export default function ComparePage() {
         </button>
       </form>
 
-      {error && <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-800 text-sm">{error}</div>}
+      {error && <div className="bg-critical/8 border border-critical/25 rounded-lg p-4 mb-6 text-critical text-sm">{error}</div>}
 
       {results[0] && results[1] && (
         <div className="bg-surface rounded-xl border border-border p-6">

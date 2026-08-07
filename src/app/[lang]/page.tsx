@@ -27,7 +27,7 @@ export default async function HomePage({ params }: Props) {
   return (
     <>
       {/* Urgency banner */}
-      <div className="bg-foreground text-white text-center py-2.5 px-4 text-sm" role="note" aria-label="Important notice">
+      <div className="bg-primary text-white text-center py-2.5 px-4 text-sm" role="note" aria-label="Important notice">
         <span className="opacity-90"><span aria-hidden="true">⚖️</span> EAA is enforceable since June 28, 2025.</span>{" "}
         <span className="font-semibold">Is your website compliant?</span>
       </div>
@@ -35,7 +35,7 @@ export default async function HomePage({ params }: Props) {
       {/* Hero */}
       <section className="hero-gradient py-20 sm:py-28" aria-labelledby="hero-heading">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h1 id="hero-heading" className="text-3xl sm:text-5xl font-bold tracking-tight mb-5">
+          <h1 id="hero-heading" className="text-4xl sm:text-6xl font-bold tracking-tight mb-5 text-balance">
             {dict.hero.title}
           </h1>
           <p className="text-lg sm:text-xl text-muted mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -118,11 +118,11 @@ export default async function HomePage({ params }: Props) {
           <h2 id="before-after-heading" className="text-2xl font-bold text-center mb-4">{beforeAfter.title}</h2>
           <p className="text-muted text-center mb-8">{beforeAfter.subtitle}</p>
           <div className="space-y-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+            <div className="bg-critical/8 border border-critical/25 rounded-lg p-4 font-mono text-sm overflow-x-auto">
               <p className="text-critical font-semibold font-sans mb-2"><span aria-hidden="true">❌</span> {beforeAfter.bad}</p>
               <code>&lt;img src=&quot;banner.jpg&quot;&gt;</code>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+            <div className="bg-primary/8 border border-primary/25 rounded-lg p-4 font-mono text-sm overflow-x-auto">
               <p className="text-primary font-semibold font-sans mb-2"><span aria-hidden="true">✅</span> {beforeAfter.good}</p>
               <code>&lt;img src=&quot;banner.jpg&quot; alt=&quot;Team celebrating product launch&quot;&gt;</code>
             </div>
@@ -151,7 +151,7 @@ export default async function HomePage({ params }: Props) {
           </div>
         </div>
 
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+        <div className="bg-critical/8 border border-critical/25 rounded-2xl p-8 text-center">
           <h3 className="text-lg font-bold mb-4 text-critical">{proof.realityTitle}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
             <div>

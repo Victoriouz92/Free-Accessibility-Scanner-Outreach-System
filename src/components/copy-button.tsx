@@ -41,7 +41,7 @@ export function CopyButton({ text, label }: Props) {
       onClick={handleCopy}
       aria-label={copied ? "Copied to clipboard" : `Copy ${label || ""} ${text}`}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
-                 bg-gray-100 text-muted hover:bg-primary-light hover:text-primary
+                 bg-primary/8 text-muted hover:bg-primary-light hover:text-primary
                  transition-colors cursor-pointer group"
     >
       {label && <span className="text-xs font-sans font-medium text-muted">{label}</span>}

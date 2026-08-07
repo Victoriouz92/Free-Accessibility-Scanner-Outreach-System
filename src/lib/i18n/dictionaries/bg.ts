@@ -217,7 +217,16 @@ const bg = {
 
   footer: {
     rights: "Всички права запазени.",
-    developedBy: "Разработено от VV Labs ЕООД",
+    developedBy: "Разработено от VV Labs",
+  },
+
+  blog: {
+    heading: "Блог",
+    subtitle: "Ръководства и статии за уеб достъпността, EAA и съответствието с изискванията.",
+    readMore: "Прочети повече",
+    backToBlog: "Обратно към блога",
+    articleCtaTitle: "Искате да проверите своя уебсайт?",
+    articleCtaButton: "Сканирай безплатно",
   },
 };
 

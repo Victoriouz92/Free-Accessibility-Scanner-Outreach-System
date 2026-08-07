@@ -1,4 +1,6 @@
 import { getPostBySlug, getAllPosts, getLocalizedPost } from "@/lib/blog";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import type { Locale } from "@/lib/i18n/config";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -37,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogArticlePage({ params }: Props) {
   const { lang, slug } = await params;
+  const dict = await getDictionary(lang as Locale);
   const rawPost = getPostBySlug(slug);
 
   if (!rawPost) notFound();
@@ -46,7 +49,7 @@ export default async function BlogArticlePage({ params }: Props) {
   return (
     <article className="max-w-3xl mx-auto px-6 py-12">
       <a href={`/${lang}/blog`} className="text-sm text-primary underline hover:text-primary-hover mb-4 inline-block">
-        <span aria-hidden="true">←</span> Back to blog
+        <span aria-hidden="true">←</span> {dict.blog.backToBlog}
       </a>
 
       {/* Hero image */}
@@ -72,7 +75,7 @@ export default async function BlogArticlePage({ params }: Props) {
           if (block.startsWith("```")) {
             const code = block.replace(/```\w*\n?/g, "");
             return (
-              <pre key={i} className="bg-gray-100 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+              <pre key={i} className="bg-primary/8 rounded-lg p-4 text-sm font-mono overflow-x-auto">
                 <code>{code}</code>
               </pre>
             );
@@ -97,12 +100,12 @@ export default async function BlogArticlePage({ params }: Props) {
 
       {/* CTA at bottom */}
       <div className="mt-12 bg-primary-light rounded-xl p-6 text-center">
-        <p className="font-semibold mb-2">Want to check your website?</p>
+        <p className="font-semibold mb-2">{dict.blog.articleCtaTitle}</p>
         <a
           href={`/${lang}`}
           className="inline-block px-6 py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary-hover transition-colors"
         >
-          Scan for free <span aria-hidden="true">→</span>
+          {dict.blog.articleCtaButton} <span aria-hidden="true">→</span>
         </a>
       </div>
     </article>

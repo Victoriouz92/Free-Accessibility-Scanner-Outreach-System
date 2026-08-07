@@ -81,7 +81,7 @@ export function FullAuditTool() {
       </form>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-800 text-sm">{error}</div>
+        <div className="bg-critical/8 border border-critical/25 rounded-lg p-4 mb-6 text-critical text-sm">{error}</div>
       )}
 
       {data && (
@@ -111,9 +111,9 @@ export function FullAuditTool() {
               <div
                 key={i}
                 className={`rounded-lg border p-4 ${
-                  r.status === "pass" ? "border-green-200 bg-green-50/50" :
-                  r.status === "fail" ? "border-red-200 bg-red-50/50" :
-                  "border-yellow-200 bg-yellow-50/50"
+                  r.status === "pass" ? "border-primary/25 bg-primary/8" :
+                  r.status === "fail" ? "border-critical/25 bg-critical/8" :
+                  "border-moderate/25 bg-moderate/8"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">

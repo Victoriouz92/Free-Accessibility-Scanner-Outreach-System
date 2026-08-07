@@ -1,4 +1,6 @@
 import { getAllPosts, getLocalizedPost } from "@/lib/blog";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 
 /**
@@ -17,13 +19,14 @@ interface Props {
 
 export default async function BlogPage({ params }: Props) {
   const { lang } = await params;
+  const dict = await getDictionary(lang as Locale);
   const posts = getAllPosts().map((p) => getLocalizedPost(p, lang));
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-12" aria-labelledby="blog-heading">
-      <h1 id="blog-heading" className="text-3xl font-bold mb-2">Blog</h1>
+      <h1 id="blog-heading" className="text-3xl font-bold mb-2">{dict.blog.heading}</h1>
       <p className="text-muted mb-10">
-        Guides and articles about web accessibility, the EAA, and compliance.
+        {dict.blog.subtitle}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,7 +68,7 @@ export default async function BlogPage({ params }: Props) {
               {/* Read more — visible to screen readers always */}
               <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100
                                transition-opacity duration-300" aria-hidden="true">
-                Read more <span aria-hidden="true">→</span>
+                {dict.blog.readMore} <span aria-hidden="true">→</span>
               </span>
             </div>
           </a>

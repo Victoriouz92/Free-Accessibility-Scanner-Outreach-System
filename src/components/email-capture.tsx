@@ -62,7 +62,7 @@ export function EmailCapture({ scanId, onSkip, onSubmit }: Props) {
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
-          className="flex-1 px-3 py-2 rounded-lg border border-border text-sm bg-white"
+          className="flex-1 px-3 py-2 rounded-lg border border-border text-sm bg-background"
         />
         <button type="submit" className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors">
           Send

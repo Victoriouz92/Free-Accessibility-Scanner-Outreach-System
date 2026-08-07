@@ -223,15 +223,15 @@ export function RemediationTool() {
       </form>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-800 text-sm">
+        <div className="bg-critical/8 border border-critical/25 rounded-lg p-4 mb-6 text-critical text-sm">
           {error}
         </div>
       )}
 
       {/* Results */}
       {scanComplete && images.length === 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-          <p className="text-green-800 font-medium">
+        <div className="bg-primary/8 border border-primary/25 rounded-xl p-6 text-center">
+          <p className="text-primary font-medium">
             ✅ No images with missing alt text found! The site looks good.
           </p>
         </div>
@@ -284,13 +284,13 @@ export function RemediationTool() {
                 key={index}
                 className={`bg-surface rounded-xl border p-4 ${
                   img.status === "approved" || img.status === "edited"
-                    ? "border-green-300 bg-green-50/50"
+                    ? "border-primary bg-primary/8"
                     : "border-border"
                 }`}
               >
                 <div className="flex gap-4">
                   {/* Image preview */}
-                  <div className="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                  <div className="w-24 h-24 flex-shrink-0 bg-primary/8 rounded-lg overflow-hidden">
                     <img
                       src={img.src}
                       alt="Preview"
@@ -321,8 +321,8 @@ export function RemediationTool() {
                         disabled={!img.suggestedAlt}
                         className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
                           img.status === "approved" || img.status === "edited"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 hover:bg-green-100 text-gray-600 hover:text-green-700"
+                            ? "bg-primary/15 text-primary"
+                            : "bg-primary/8 hover:bg-primary/15 text-muted hover:text-primary"
                         }`}
                       >
                         {img.status === "approved" || img.status === "edited" ? "✓" : "Approve"}

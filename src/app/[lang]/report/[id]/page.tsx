@@ -27,8 +27,8 @@ export default async function ReportPage({ params, searchParams }: Props) {
   if (isPaid) {
     return (
       <section className="max-w-3xl mx-auto px-6 py-12" aria-labelledby="report-paid-heading">
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 text-center" role="status">
-          <p className="text-green-800 font-medium">
+        <div className="bg-primary/8 border border-primary/25 rounded-xl p-6 mb-8 text-center" role="status">
+          <p className="text-primary font-medium">
             <span aria-hidden="true">✅</span> Payment confirmed — your {tierName} is unlocked below.
           </p>
         </div>
