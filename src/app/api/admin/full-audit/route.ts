@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPageContent } from "@/lib/browserless";
+import { getPageContent } from "@/lib/headless-browser";
 
 interface AuditResult { test: string; status: "pass" | "fail" | "warning"; details: string; }
 

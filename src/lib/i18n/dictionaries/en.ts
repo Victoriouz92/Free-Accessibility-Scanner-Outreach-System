@@ -167,6 +167,10 @@ const en = {
     cachedNotice: "These results are from a recent scan. New results will be available in 24 hours.",
     viewToggleDev: "Developer",
     viewToggleOwner: "Business Owner",
+    // Statement generator CTA
+    statementTitle: "Need an accessibility statement too?",
+    statementDesc: "The EAA requires one on most sites. We'll pre-fill it with the issues found in this scan.",
+    statementButton: "Generate statement →",
   },
 
   // Severity labels

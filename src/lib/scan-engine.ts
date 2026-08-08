@@ -1,8 +1,9 @@
 import type { ScanResult, ViolationExample, Severity } from "./types";
-import { getPageContent, analyzeHtml } from "./browserless";
+import { runAxeScan } from "./headless-browser";
 
 /**
- * Scanner Engine — uses Browserless HTTP API (works on Vercel serverless)
+ * Scanner Engine — runs real axe-core against a live headless browser page
+ * (self-hosted, no third-party scanning API)
  */
 
 const IMPACT_TO_SEVERITY: Record<string, Severity> = {
@@ -20,12 +21,8 @@ export async function runScan(url: string): Promise<ScanResult> {
 
   console.log(`[Scanner] Starting scan for: ${url}`);
 
-  // Get rendered HTML via Browserless
-  const html = await getPageContent(url);
-  console.log(`[Scanner] Got page HTML (${html.length} chars)`);
-
-  // Analyze HTML for accessibility violations
-  const axeResults = analyzeHtml(html, url);
+  // Run real axe-core against the live, rendered page
+  const axeResults = await runAxeScan(url);
   const violations = axeResults.violations || [];
 
   console.log(`[Scanner] axe-core found ${violations.length} violation types`);

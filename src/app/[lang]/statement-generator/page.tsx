@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import type { ScanResult } from "@/lib/types";
 
 /**
  * Accessibility Statement Generator
  * Free tool — user fills in details, gets a ready-to-publish statement.
  * Attracts organic traffic, builds trust, collects soft leads.
+ *
+ * If arrived via ?scanId=xxx (from a finished scan report), pre-fills
+ * the website URL and known issues from that scan's real findings —
+ * instead of the person having to remember and retype them.
  */
 
 const t = {
   en: {
     heading: "Accessibility Statement Generator",
     subtitle: "Create a free accessibility statement for your website. Required by the European Accessibility Act for most businesses.",
+    prefillLoading: "Loading known issues from your scan…",
+    prefillDone: "Pre-filled the website URL and known issues from your scan below — edit anything before generating.",
     companyName: "Company name",
     websiteUrl: "Website URL",
     contactEmail: "Accessibility contact email",
@@ -51,6 +58,8 @@ const t = {
   bg: {
     heading: "Генератор на декларация за достъпност",
     subtitle: "Създайте безплатна декларация за достъпност за вашия уебсайт. Изисква се от Европейския акт за достъпност за повечето бизнеси.",
+    prefillLoading: "Зареждане на известни проблеми от сканирането…",
+    prefillDone: "Предварително попълнихме URL адреса и известните проблеми от сканирането по-долу — редактирайте преди да генерирате.",
     companyName: "Име на фирмата",
     websiteUrl: "URL адрес на уебсайта",
     contactEmail: "Имейл за контакт относно достъпността",
@@ -89,8 +98,18 @@ const t = {
 };
 
 export default function StatementGeneratorPage() {
+  return (
+    <Suspense fallback={null}>
+      <StatementGeneratorForm />
+    </Suspense>
+  );
+}
+
+function StatementGeneratorForm() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const lang = params.lang as string;
+  const scanId = searchParams.get("scanId");
   const dict = lang === "bg" ? t.bg : t.en;
   const locale = lang === "bg" ? "bg-BG" : "en-US";
 
@@ -103,6 +122,39 @@ export default function StatementGeneratorPage() {
     knownIssues: "",
   });
   const [generated, setGenerated] = useState("");
+  const [prefillNotice, setPrefillNotice] = useState<"loading" | "done" | "none">(scanId ? "loading" : "none");
+
+  useEffect(() => {
+    if (!scanId) return;
+
+    let cancelled = false;
+
+    fetch(`/api/scan/${scanId}`)
+      .then((res) => res.json())
+      .then((data: { status: string; result?: ScanResult }) => {
+        if (cancelled || data.status !== "complete" || !data.result) {
+          if (!cancelled) setPrefillNotice("none");
+          return;
+        }
+
+        const { url, examples } = data.result;
+        const knownIssues = examples
+          .map((ex) => `- ${ex.description}${ex.wcagCriterion ? ` (WCAG ${ex.wcagCriterion})` : ""}`)
+          .join("\n");
+
+        setForm((prev) => ({
+          ...prev,
+          websiteUrl: prev.websiteUrl || url,
+          knownIssues: prev.knownIssues || knownIssues,
+        }));
+        setPrefillNotice("done");
+      })
+      .catch(() => {
+        if (!cancelled) setPrefillNotice("none");
+      });
+
+    return () => { cancelled = true; };
+  }, [scanId]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -150,6 +202,17 @@ ${s.generatedWith}`;
       <p className="text-muted mb-8">
         {dict.subtitle}
       </p>
+
+      {prefillNotice === "loading" && (
+        <div className="bg-primary-light rounded-lg p-4 text-sm mb-6" role="status">
+          {dict.prefillLoading}
+        </div>
+      )}
+      {prefillNotice === "done" && (
+        <div className="bg-primary-light rounded-lg p-4 text-sm mb-6 text-primary">
+          {dict.prefillDone}
+        </div>
+      )}
 
       {!generated ? (
         <form onSubmit={generate} className="space-y-5">

@@ -4,8 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase";
 /**
  * GET /api/report-pdf?scanId=xxx&tier=free|detailed|full&view=developer|owner
  *
- * On Vercel: returns error (no Playwright available)
- * On localhost: generates PDF via Playwright
+ * Generates PDF via a self-hosted headless browser (Playwright).
+ * No third-party API or subscription required.
  */
 
 export async function GET(request: NextRequest) {
@@ -28,11 +28,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { generatePdf } = await import("@/lib/browserless");
+    const { generatePdf } = await import("@/lib/headless-browser");
     const html = generateReportHtml(scan, tier, view);
     const pdfBuffer = await generatePdf(html);
 
-    return new Response(pdfBuffer, {
+    return new Response(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="accesscheck-report-${scanId.slice(0, 8)}.pdf"`,

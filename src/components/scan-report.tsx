@@ -258,6 +258,19 @@ export function ScanReport({ result, scanId, lang, dict, cached }: Props) {
           </p>
         </div>
       </section>
+
+      <section className="mt-8 bg-surface border border-border rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <p className="font-semibold mb-1">{dict.report.statementTitle}</p>
+          <p className="text-sm text-muted">{dict.report.statementDesc}</p>
+        </div>
+        <a
+          href={`/${lang}/statement-generator?scanId=${scanId}`}
+          className="shrink-0 px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
+        >
+          {dict.report.statementButton}
+        </a>
+      </section>
     </div>
   );
 }

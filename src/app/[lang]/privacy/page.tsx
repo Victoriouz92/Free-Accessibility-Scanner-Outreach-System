@@ -39,8 +39,8 @@ export default async function PrivacyPage({ params }: Props) {
             <ul className="list-disc pl-6 space-y-2">
               <li>
                 <strong>Сканиране на уебсайтове:</strong> когато въведете URL адрес за сканиране, ние
-                изпращаме този адрес към нашия доставчик за рендиране (Browserless.io), за да извлечем
-                HTML кода на страницата, след което го анализираме локално за проблеми с достъпността.
+                зареждаме страницата в самостоятелно хостван, автоматизиран браузър (без услуга на
+                трета страна) и я анализираме локално с axe-core за проблеми с достъпността.
                 Съхраняваме сканирания URL адрес, получения резултат, брой проблеми, няколко примерни
                 нарушения и продължителността на сканирането. Не изискваме регистрация и не събираме
                 съзнателно лични данни за вас чрез самото сканиране.
@@ -79,9 +79,8 @@ export default async function PrivacyPage({ params }: Props) {
             <h2 className="text-lg font-semibold text-foreground mb-2">4. Трети страни, които използваме (обработващи данни)</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Supabase</strong> — хоства нашата база данни (резултати от сканиране, съобщения от контактната форма, записи за плащания).</li>
-              <li><strong>Browserless.io</strong> — рендира страниците, които ни молите да сканираме.</li>
               <li><strong>Stripe</strong> — обработва плащанията за доклади и ни предоставя имейл адреса на купувача след плащане.</li>
-              <li><strong>Vercel</strong> — хоства този уебсайт и, както всеки уеб хостинг, може да записва IP адреси в сървърни/CDN логове за целите на сигурност и надеждност.</li>
+              <li><strong>Railway</strong> — хоства този уебсайт и самостоятелно хоствания браузър, използван за сканиране, и както всеки уеб хостинг, може да записва IP адреси в сървърни логове за целите на сигурност и надеждност.</li>
             </ul>
             <p className="mt-2">
               Имаме сключени споразумения за обработка на данни с нашите обработващи данни, където
@@ -171,11 +170,12 @@ export default async function PrivacyPage({ params }: Props) {
           <h2 className="text-lg font-semibold text-foreground mb-2">2. Data we collect</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <strong>Website scans:</strong> when you enter a URL to scan, we submit that URL to
-              our rendering provider (Browserless.io) to fetch the page&apos;s HTML, then analyze
-              it locally for accessibility issues. We store the scanned URL, the resulting score,
-              issue counts, a few example violations, and scan duration. We do not require an
-              account and do not knowingly collect personal data about you through the scan itself.
+              <strong>Website scans:</strong> when you enter a URL to scan, we load the page in a
+              self-hosted, automated browser (no third-party scanning service) and analyze it
+              locally with axe-core for accessibility issues. We store the scanned URL, the
+              resulting score, issue counts, a few example violations, and scan duration. We do
+              not require an account and do not knowingly collect personal data about you through
+              the scan itself.
             </li>
             <li>
               <strong>Contact form:</strong> if you contact us or request a report by email, we
@@ -209,9 +209,8 @@ export default async function PrivacyPage({ params }: Props) {
           <h2 className="text-lg font-semibold text-foreground mb-2">4. Third parties we use (processors)</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Supabase</strong> — hosts our database (scan results, contact submissions, payment records).</li>
-            <li><strong>Browserless.io</strong> — renders the pages you ask us to scan.</li>
             <li><strong>Stripe</strong> — processes report payments and provides us the buyer&apos;s email after checkout.</li>
-            <li><strong>Vercel</strong> — hosts this website and, like any web host, may log IP addresses in server/CDN logs for security and reliability purposes.</li>
+            <li><strong>Railway</strong> — hosts this website and the self-hosted browser used for scanning, and like any web host, may log IP addresses in server logs for security and reliability purposes.</li>
           </ul>
           <p className="mt-2">
             We have data processing agreements in place with our processors where required by

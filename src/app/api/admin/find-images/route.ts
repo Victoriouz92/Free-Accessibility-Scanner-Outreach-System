@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPageContent } from "@/lib/browserless";
+import { getPageContent } from "@/lib/headless-browser";
 
 export async function POST(request: NextRequest) {
   try {
     const { url, singlePage } = await request.json();
     if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 });
 
-    // Get rendered HTML via Browserless
+    // Get rendered HTML via headless browser
     const html = await getPageContent(url);
 
     // Parse images without alt from the HTML (simple regex approach for serverless)
